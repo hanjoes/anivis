@@ -22,6 +22,7 @@ tasks = Queue()
 
 def worker(name, work):
     with open(name + FILE_SUFFIX, 'w') as f:
+        f.write('<root>')
         gevent.sleep(0)
         ad = AnimeDetail()
         while not tasks.empty():
@@ -30,6 +31,7 @@ def worker(name, work):
             print name + ' woke up doing work.. ' + request
             batch_data = ad.fetch_details(request)
             f.write(batch_data)
+        f.write('</root>')
 
 
 def boss(name, work):
@@ -56,7 +58,6 @@ def process(list, num_workers):
 if __name__ == '__main__':
     # put all details into string
     ad = AnimeDetail()
-    detail = ''
     work = []
     try:
         with open(IDS_FILENAME, 'r') as idsf:
