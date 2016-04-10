@@ -129,3 +129,6 @@ target/
 
 # Ignore node modules
 node_modules/
+
+# Ignore built files
+scripts.min.js
