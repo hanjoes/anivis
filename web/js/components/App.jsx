@@ -1,6 +1,7 @@
 var React = require('react');
 var Search = require('./Search.jsx');
 var Filter = require('./Filter.jsx');
+var Actions = require('../actions/Actions');
 
 var App = React.createClass({
   getInitialState() {
@@ -10,17 +11,32 @@ var App = React.createClass({
     }
   },
 
-  handleUserInput: function(searchText, attributes) {
+  handleUserInput(searchText, attributes) {
     this.setState({
       searchText: searchText,
-      attributes: attributes
+    });
+  },
+
+  // flip the status of the attribute
+  handleFilterAction(attribute) {
+    this.setState({
+      searchText: searchText,
+    });
+  },
+
+  componentWillMount() {
+    var component = this;
+    var filters = Actions.getAttributes(function(data) {
+      var filters = data["filters"];
+      this.attributes = {}
+      filters.forEach(function(attribute) {
+        attributes[attribute] = false;
+      });
+      component.setState({ attributes: attributes });
     });
   },
 
   render() {
-
-
-
     return (
       <div>
       <Search
@@ -29,7 +45,7 @@ var App = React.createClass({
       />
       <Filter
       attributes={this.state.attributes}
-      inputHandler={this.handleUserInput}
+      inputHandler={this.handleFilterAction}
       />
       </div>
     );
