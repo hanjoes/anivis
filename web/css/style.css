@@ -24,11 +24,15 @@ div.tooltip {
 }
 
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Jura', sans-serif;
   font-size: 12pt;
 }
 
 h1, h2 {
-  font: font-family: 'Syncopate', sans-serif;
+  font-family: 'Jura', sans-serif;
   color: purple;
+}
+
+.page {
+  padding-left: 25px;
 }

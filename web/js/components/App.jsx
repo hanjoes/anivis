@@ -1,9 +1,11 @@
 var React = require('react');
+// components
 var Search = require('./Search.jsx');
 var Filter = require('./Filter.jsx');
-var TreeView = require('./TreeView.jsx');
-var RankingView = require('./RankingView.jsx');
+// js modules
 var Actions = require('../actions/Actions');
+var TreeView = require('../visualizations/TreeView');
+var RankingView = require('../visualizations/RankingView');
 
 var App = React.createClass({
   getInitialState() {
@@ -51,6 +53,10 @@ var App = React.createClass({
         );
       }
     }
+
+    TreeView.visualize();
+    RankingView.visualize();
+
     return (
       <div>
       <h1>ANIVIS</h1>
@@ -61,8 +67,6 @@ var App = React.createClass({
       />
       {filters}
       </form>
-      <TreeView />
-      <RankingView />
       </div>
     );
   }
