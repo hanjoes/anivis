@@ -1,10 +1,22 @@
 var React = require('react');
 
 var Filter = React.createClass({
+  handleChange() {
+  },
+
   render() {
     return (
-      <div>
-      </div>
+      <form>
+      <p>
+      <input
+      type="checkbox"
+      checked="true"
+      ref={(ref) => this.typeCheckBox = ref}
+      onChange={this.handleChange}
+      />
+      Type
+      </p>
+      </form>
     );
   }
 });

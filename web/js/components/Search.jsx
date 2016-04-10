@@ -1,10 +1,21 @@
 var React = require('react');
 
 var Search = React.createClass({
+  handleChange() {
+    this.props.inputHandler(this.textInput.value, []);
+  },
+
   render() {
     return (
-      <div>
-      </div>
+      <form>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={this.props.searchText}
+          ref={(ref) => this.textInput = ref}
+          onChange={this.handleChange}
+        />
+      </form>
     );
   }
 });
