@@ -1,13 +1,15 @@
 var React = require('react');
 var Search = require('./Search.jsx');
 var Filter = require('./Filter.jsx');
+var TreeView = require('./TreeView.jsx');
+var RankingView = require('./RankingView.jsx');
 var Actions = require('../actions/Actions');
 
 var App = React.createClass({
   getInitialState() {
     return {
       searchText: "",
-      attributes: []
+      attributes: {}
     }
   },
 
@@ -17,10 +19,10 @@ var App = React.createClass({
     });
   },
 
-  // flip the status of the attribute
   handleFilterAction(attribute) {
+    this.attributes[attribute] = !this.attributes[attribute];
     this.setState({
-      searchText: searchText,
+      attributes: this.attributes
     });
   },
 
@@ -28,25 +30,39 @@ var App = React.createClass({
     var component = this;
     var filters = Actions.getAttributes(function(data) {
       var filters = data["filters"];
-      this.attributes = {}
+      component.attributes = {};
       filters.forEach(function(attribute) {
-        attributes[attribute] = false;
+        component.attributes[attribute] = false;
       });
-      component.setState({ attributes: attributes });
+      component.setState({ attributes: component.attributes });
     });
   },
 
   render() {
+    var filters = [];
+    for (var key in this.attributes) {
+      if (this.attributes.hasOwnProperty(key)) {
+        filters.push(<Filter
+          attribute={key}
+          isChecked={this.attributes[key]}
+          inputHandler={this.handleFilterAction}
+          key={key}
+          />
+        );
+      }
+    }
     return (
       <div>
+      <h1>ANIVIS</h1>
+      <form>
       <Search
       searchText={this.state.searchText}
       inputHandler={this.handleUserInput}
       />
-      <Filter
-      attributes={this.state.attributes}
-      inputHandler={this.handleFilterAction}
-      />
+      {filters}
+      </form>
+      <TreeView />
+      <RankingView />
       </div>
     );
   }

@@ -1,20 +1,22 @@
-var React = require('react');
-var CheckboxItem = require('./CheckboxItem.jsx');
+var React = require("react");
 
 var Filter = React.createClass({
+  handleChange() {
+    this.props.inputHandler(this.props.attribute);
+  },
+
   render() {
-    var attributes = this.props.attributes;
-    var component = this;
-    var filters = [];
-    for (var key in attributes) {
-      if (attributes.hasOwnProperty(key)) {
-        filters.push(
-          <CheckboxItem key={key} attribute={key}/>
-        );
-      }
-    }
     return (
-      <form>{filters}</form>
+      <span>
+      <input
+      type="checkbox"
+      checked={this.props.isChecked}
+      key={this.props.attribute}
+      ref={(ref) => this.checkBox = ref}
+      onChange={this.handleChange}
+      />
+      {this.props.attribute}
+      </span>
     );
   }
 });

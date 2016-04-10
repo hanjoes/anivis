@@ -7,15 +7,13 @@ var Search = React.createClass({
 
   render() {
     return (
-      <form>
-        <input
-          type="text"
-          placeholder="Search..."
-          value={this.props.searchText}
-          ref={(ref) => this.textInput = ref}
-          onChange={this.handleChange}
-        />
-      </form>
+      <input
+      type="text"
+      placeholder="Search..."
+      value={this.props.searchText}
+      ref={(ref) => this.textInput = ref}
+      onChange={this.handleChange}
+      />
     );
   }
 });

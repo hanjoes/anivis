@@ -3,8 +3,9 @@ var React = require('react');
 var RankingView = React.createClass({
   render() {
     return (
-      <div>
-      </div>
+      <span>
+      <h2>Ranking View</h2>
+      </span>
     );
   }
 });

@@ -3,8 +3,9 @@ var React = require('react');
 var TreeView = React.createClass({
   render() {
     return (
-      <div>
-      </div>
+      <span>
+      <h2>Tree View</h2>
+      </span>
     );
   }
 });
