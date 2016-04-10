@@ -126,3 +126,6 @@ target/
 
 # Spyder project settings
 .spyderproject
+
+# Ignore node modules
+node_modules/
