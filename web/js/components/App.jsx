@@ -38,6 +38,8 @@ var App = React.createClass({
       });
       component.setState({ attributes: component.attributes });
     });
+    
+    TreeView();
   },
 
   render() {
@@ -53,8 +55,6 @@ var App = React.createClass({
         );
       }
     }
-
-    TreeView.visualize();
     RankingView.visualize();
 
     return (
