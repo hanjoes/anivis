@@ -62,6 +62,12 @@ var App = React.createClass({
         root: data,
       });
     });
+
+    Actions.getRankedAnimes(function(data) {
+      component.setState({
+        ranks: data,
+      });
+    });
   },
 
   render() {
@@ -90,7 +96,7 @@ var App = React.createClass({
       </form>
 
       <TreeView root={this.state.root}/>
-      <RankingView />
+      <RankingView ranks={this.state.ranks}/>
       </div>
     );
   }

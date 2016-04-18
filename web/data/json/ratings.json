@@ -1,0 +1,15 @@
+{
+  "ratings": [
+    {"rating": "9.5", "anime": {"name": "A"}},
+    {"rating": "9.5", "anime": {"name": "B"}},
+    {"rating": "8.7", "anime": {"name": "C"}},
+    {"rating": "8.7", "anime": {"name": "D"}},
+    {"rating": "7.8", "anime": {"name": "E"}},
+    {"rating": "7.0", "anime": {"name": "F"}},
+    {"rating": "7.0", "anime": {"name": "G"}},
+    {"rating": "6.5", "anime": {"name": "H"}},
+    {"rating": "6.5", "anime": {"name": "I"}},
+    {"rating": "5.5", "anime": {"name": "J"}},
+    {"rating": "5.5", "anime": {"name": "K"}}
+  ]
+}

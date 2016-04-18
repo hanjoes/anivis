@@ -24,6 +24,12 @@ module.exports = {
     d3.json("../../data/json/flare.json", function(data) {
       callback && callback(data);
     });
+  },
+
+  getRankedAnimes(callback) {
+    d3.json("../../data/json/ratings.json", function(data) {
+      callback && callback(data);
+    });
   }
 
 };
