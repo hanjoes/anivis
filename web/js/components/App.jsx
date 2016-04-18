@@ -23,17 +23,21 @@ var App = React.createClass({
 
   handleFilterAction(attribute, selectedCategory) {
     // flip the value
-    var oldStats = this.attributes[attribute];
-    var newStats = []
-    oldStats.forEach(function(stat) {
-      if (stat.hasOwnProperty(selectedCategory)) {
-        stat[selectedCategory] = true;
-      }
-      newStats.push(stat);
-    });
-    this.attributes[attribute] = newStats;
-    this.setState({
-      attributes: this.attributes,
+    // var oldStats = this.attributes[attribute];
+    // var newStats = []
+    // oldStats.forEach(function(stat) {
+    //   if (stat.hasOwnProperty(selectedCategory)) {
+    //     stat[selectedCategory] = true;
+    //   }
+    //   newStats.push(stat);
+    // });
+    // this.attributes[attribute] = newStats;
+
+    var component = this;
+    Actions.getFilteredData([], function(data) {
+      component.setState({
+        root: data,
+      });
     });
   },
 
@@ -51,6 +55,12 @@ var App = React.createClass({
         });
       });
       component.setState({ attributes: component.attributes });
+    });
+
+    Actions.getFilteredData([], function(data) {
+      component.setState({
+        root: data,
+      });
     });
   },
 
@@ -79,7 +89,7 @@ var App = React.createClass({
       {filters}
       </form>
 
-      <TreeView />
+      <TreeView root={this.state.root}/>
       <RankingView />
       </div>
     );

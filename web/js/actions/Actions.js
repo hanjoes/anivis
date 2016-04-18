@@ -12,12 +12,16 @@ module.exports = {
 
   getFilteredData(filters, callback) {
     // build the path first
-    var path = base;
-    filters.forEach(function(filter) {
-      path = path + '/' + filter;
-    });
+    // var path = base;
+    // filters.forEach(function(filter) {
+    //   path = path + '/' + filter;
+    // });
+    //
+    // d3.json(path + 'anime.json', (data) => {
+    //   callback && callback(data);
+    // });
 
-    d3.json(path + 'anime.json', (data) => {
+    d3.json("../../data/json/flare.json", function(data) {
       callback && callback(data);
     });
   }

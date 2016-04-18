@@ -4,12 +4,12 @@ var React = require("react");
 var TreeView = React.createClass({
   componentDidMount() {
     var m = {t:25,b:25,l:0,r:25};
-    var w = 1000 - m.l - m.r;
-    var h = 1000 - m.t - m.b;
+    this.w = 1000 - m.l - m.r;
+    this.h = 1000 - m.t - m.b;
 
     this.vis = d3.select("#tree")
-    .attr("width", w + m.l + m.r)
-    .attr("height", h + m.t + m.b)
+    .attr("width", this.w + m.l + m.r)
+    .attr("height", this.h + m.t + m.b)
     .append("g")
     .attr("transform", "translate(" + m.l + "," + m.t + ")");
 
@@ -17,20 +17,11 @@ var TreeView = React.createClass({
     .on("tick", this.tick)
     .charge(function(d) { return d._children ? -d.size / 100 : -30; })
     .linkDistance(function(d) { return d.target._children ? 80 : 30; })
-    .size([w, h - 160]);
-
-    var component = this;
-    d3.json("../../data/json/flare.json", function(json) {
-      component.root = json;
-      component.root.fixed = true;
-      component.root.x = w / 2;
-      component.root.y = h / 2 - 80;
-      component.visualize();
-    });
+    .size([this.w, this.h - 160]);
   },
 
   visualize() {
-    var nodes = this.flatten(this.root),
+    var nodes = this.flatten(this.props.root),
     links = d3.layout.tree().links(nodes);
 
     // Restart the force layout.
@@ -120,6 +111,13 @@ var TreeView = React.createClass({
 
   componentDidUpdate() {
     // this.visualize();
+    if (this.props.root) {
+      this.root = this.props.root;
+      this.root.fixed = true;
+      this.root.x = this.w / 2;
+      this.root.y = this.h / 2 - 80;
+      this.visualize();
+    }
   },
 
   render() {
