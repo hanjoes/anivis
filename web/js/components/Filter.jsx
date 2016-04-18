@@ -2,20 +2,36 @@ var React = require("react");
 
 var Filter = React.createClass({
   handleChange() {
-    this.props.inputHandler(this.props.attribute);
+    var selector = this._selector;
+    var selectedCategory = selector[selector.selectedIndex].value
+    this.props.inputHandler(this.props.attribute, selectedCategory);
   },
 
   render() {
+    var options = [];
+    var allKey = this.props.attribute + "_all";
+    options.push(
+      <option value={allKey} key={allKey}>
+          all
+      </option>
+    );
+    this.props.categories.forEach(function(categoryStat) {
+      for (var key in categoryStat) {
+        if (categoryStat.hasOwnProperty(key)) {
+          options.push(
+            <option value={key} key={key}>
+              {key}
+            </option>
+          );
+        }
+      }
+    });
     return (
       <span>
-      <input
-      type="checkbox"
-      checked={this.props.isChecked}
-      key={this.props.attribute}
-      ref={(ref) => this.checkBox = ref}
-      onChange={this.handleChange}
-      />
-      {this.props.attribute}
+        {this.props.attribute}:
+        <select onChange={this.handleChange} ref={(c) => this._selector = c}>
+          {options}
+        </select>
       </span>
     );
   }

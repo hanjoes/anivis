@@ -33,6 +33,10 @@ h1, h2 {
   color: purple;
 }
 
+span {
+  padding-left: 10px;
+}
+
 .page {
   padding-left: 25px;
 }

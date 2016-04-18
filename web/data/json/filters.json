@@ -1,9 +1,17 @@
 {
   "filters":
   [
-    "Theme",
-    "Genre",
-    "Media",
-    "Ranking"
+    {
+      "name": "Themes",
+      "attributes": ["fighting", "martial arts"]
+    },
+    {
+      "name": "Genres",
+      "attributes": ["action", "romantic"]
+    },
+    {
+      "name": "Media",
+      "attributes": ["tv", "magazine"]
+    }
   ]
 }

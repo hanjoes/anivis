@@ -2,10 +2,10 @@ var React = require('react');
 // components
 var Search = require('./Search.jsx');
 var Filter = require('./Filter.jsx');
+var TreeView = require('./TreeView.jsx');
+var RankingView = require('./RankingView.jsx');
 // js modules
 var Actions = require('../actions/Actions');
-var TreeView = require('../visualizations/TreeView');
-var RankingView = require('../visualizations/RankingView');
 
 var App = React.createClass({
   getInitialState() {
@@ -21,10 +21,19 @@ var App = React.createClass({
     });
   },
 
-  handleFilterAction(attribute) {
-    this.attributes[attribute] = !this.attributes[attribute];
+  handleFilterAction(attribute, selectedCategory) {
+    // flip the value
+    var oldStats = this.attributes[attribute];
+    var newStats = []
+    oldStats.forEach(function(stat) {
+      if (stat.hasOwnProperty(selectedCategory)) {
+        stat[selectedCategory] = true;
+      }
+      newStats.push(stat);
+    });
+    this.attributes[attribute] = newStats;
     this.setState({
-      attributes: this.attributes
+      attributes: this.attributes,
     });
   },
 
@@ -34,12 +43,15 @@ var App = React.createClass({
       var filters = data["filters"];
       component.attributes = {};
       filters.forEach(function(attribute) {
-        component.attributes[attribute] = false;
+        component.attributes[attribute["name"]] = [];
+        attribute["attributes"].forEach(function(attributeName) {
+          var categoryStat = {};
+          categoryStat[attributeName] = false;
+          component.attributes[attribute["name"]].push(categoryStat);
+        });
       });
       component.setState({ attributes: component.attributes });
     });
-    
-    TreeView();
   },
 
   render() {
@@ -48,14 +60,13 @@ var App = React.createClass({
       if (this.attributes.hasOwnProperty(key)) {
         filters.push(<Filter
           attribute={key}
-          isChecked={this.attributes[key]}
+          categories={this.attributes[key]}
           inputHandler={this.handleFilterAction}
           key={key}
           />
         );
       }
     }
-    RankingView.visualize();
 
     return (
       <div>
@@ -67,6 +78,9 @@ var App = React.createClass({
       />
       {filters}
       </form>
+
+      <TreeView />
+      <RankingView />
       </div>
     );
   }

@@ -1,0 +1,28 @@
+{
+ "name": "Animes",
+ "isRoot": "yes",
+ "children": [
+      {
+        "name": "TV",
+        "subcategory" : "2",
+        "children": [
+          {
+            "name": "Themes",
+            "children": [
+              {
+                "name": "romantic",
+                "subcategory": "3",
+                "children": [
+                  {
+                    "name": "Romantic",
+                    "leaf": "yes"
+                  }
+                ]
+              }
+              
+            ]
+          }
+        ]
+      }
+     ]
+}

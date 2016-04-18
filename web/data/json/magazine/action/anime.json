@@ -1,0 +1,27 @@
+{
+ "name": "Animes",
+ "isRoot": "yes",
+ "children": [
+      {
+        "name": "Magazine",
+        "subcategory" : "2",
+        "children": [
+          {
+            "name": "Themes",
+            "children": [
+              {
+                "name": "action",
+                "subcategory": "3",
+                "children": [
+                  {
+                    "name": "Mobile Fighter G Gundam",
+                    "leaf": "yes"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+     ]
+}
