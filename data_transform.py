@@ -57,6 +57,9 @@ class Transform:
     UNKNOWN_THEME = "No Theme"
     UNKNOWN_GENRE = "No Genre"
     ALL = "all"
+    ALL_MANGA = "all_manga"
+    ALL_ANIME = "all_anime"
+    MANGA_TYPE = ["manga", "magazine"]
 
     def __init__(self):
         pass
@@ -229,96 +232,103 @@ class Transform:
     def gen_default_leaf(self, name):
         return {self.NAME: name, self.IS_ROOT: self.FALSE, self.IS_LEAF: self.TRUE}
 
-    def intermediate_transform(self, json_data):
-        inter_data = {}
-        for data in json_data:
-            type = data  # TV, OVA, MOVIE , MANGA ,MAGAZINE...
-            if type not in inter_data:
-                inter_data[type] = {}
-            for anime in json_data[data]:
-                anime_name = anime[self.ATTR_NAME]
-
-                # process all different themes
-                if self.ATTR_THEMES not in inter_data[type]:
-                    inter_data[type][self.ATTR_THEMES] = {}
-                if len(anime[self.ATTR_THEMES]) == 0:
-                    if self.UNKNOWN_THEME not in inter_data[type][self.ATTR_THEMES]:
-                        inter_data[type][self.ATTR_THEMES][self.UNKNOWN_THEME] = {}
-                    inter_data[type][self.ATTR_THEMES][self.UNKNOWN_THEME][anime_name] = self.gen_default_leaf(
-                        anime_name)
-
-                else:
-                    for theme in anime[self.ATTR_THEMES]:
-                        theme = theme.replace("/", "")
-                        if theme not in inter_data[type][self.ATTR_THEMES]:
-                            inter_data[type][self.ATTR_THEMES][theme] = {}
-                        inter_data[type][self.ATTR_THEMES][theme][anime_name] = self.gen_default_leaf(anime_name)
-
-                # process all different genre
-                if self.ATTR_GENRE not in inter_data[type]:
-                    inter_data[type][self.ATTR_GENRE] = {}
-
-                if len(anime[self.ATTR_GENRE]) == 0:
-                    if self.UNKNOWN_GENRE not in inter_data[type][self.ATTR_GENRE]:
-                        inter_data[type][self.ATTR_GENRE][self.UNKNOWN_GENRE] = {}
-                    inter_data[type][self.ATTR_GENRE][self.UNKNOWN_GENRE][anime_name] = self.gen_default_leaf(
-                        anime_name)
-                else:
-                    for genre in anime[self.ATTR_GENRE]:
-                        genre = genre.replace("/", "")
-                        if genre not in inter_data[type][self.ATTR_GENRE]:
-                            inter_data[type][self.ATTR_GENRE][genre] = {}
-                        inter_data[type][self.ATTR_GENRE][genre][anime_name] = self.gen_default_leaf(anime_name)
-        self.gen_zoomed_in_view_data(inter_data)
-
-    def gen_zoomed_in_view_data(self, intermediate_data):
-        import re
-        root = "web"
-        manga_type = ["manga", "magazine"]
-        for type in intermediate_data:
-            path = "db/anime/"
-            if type in manga_type:
-                path = "db/manga/"
-            path += str(re.escape(type))
-            for categories in intermediate_data[type]:
-                dir_path = path + "/" + str(re.escape(categories))
-                self.create_dir(dir_path)
-                for data in intermediate_data[type][categories]:
-                    des_file = dir_path + "/" + re.escape(data) + ".json"
-                    with open(des_file, "w+") as jsonfile:
-                        jsonfile.write(json.dumps(intermediate_data[type][categories][data]))
+    # def intermediate_transform(self, json_data):
+    #     inter_data = {}
+    #     for data in json_data:
+    #         type = data  # TV, OVA, MOVIE , MANGA ,MAGAZINE...
+    #         if type not in inter_data:
+    #             inter_data[type] = {}
+    #         for anime in json_data[data]:
+    #             anime_name = anime[self.ATTR_NAME]
+    #
+    #             # process all different themes
+    #             if self.ATTR_THEMES not in inter_data[type]:
+    #                 inter_data[type][self.ATTR_THEMES] = {}
+    #             if len(anime[self.ATTR_THEMES]) == 0:
+    #                 if self.UNKNOWN_THEME not in inter_data[type][self.ATTR_THEMES]:
+    #                     inter_data[type][self.ATTR_THEMES][self.UNKNOWN_THEME] = {}
+    #                 inter_data[type][self.ATTR_THEMES][self.UNKNOWN_THEME][anime_name] = self.gen_default_leaf(
+    #                     anime_name)
+    #
+    #             else:
+    #                 for theme in anime[self.ATTR_THEMES]:
+    #                     theme = theme.replace("/", "")
+    #                     if theme not in inter_data[type][self.ATTR_THEMES]:
+    #                         inter_data[type][self.ATTR_THEMES][theme] = {}
+    #                     inter_data[type][self.ATTR_THEMES][theme][anime_name] = self.gen_default_leaf(anime_name)
+    #
+    #             # process all different genre
+    #             if self.ATTR_GENRE not in inter_data[type]:
+    #                 inter_data[type][self.ATTR_GENRE] = {}
+    #
+    #             if len(anime[self.ATTR_GENRE]) == 0:
+    #                 if self.UNKNOWN_GENRE not in inter_data[type][self.ATTR_GENRE]:
+    #                     inter_data[type][self.ATTR_GENRE][self.UNKNOWN_GENRE] = {}
+    #                 inter_data[type][self.ATTR_GENRE][self.UNKNOWN_GENRE][anime_name] = self.gen_default_leaf(
+    #                     anime_name)
+    #             else:
+    #                 for genre in anime[self.ATTR_GENRE]:
+    #                     genre = genre.replace("/", "")
+    #                     if genre not in inter_data[type][self.ATTR_GENRE]:
+    #                         inter_data[type][self.ATTR_GENRE][genre] = {}
+    #                     inter_data[type][self.ATTR_GENRE][genre][anime_name] = self.gen_default_leaf(anime_name)
+    #     self.gen_zoomed_in_view_data(inter_data)
+    #
+    # def gen_zoomed_in_view_data(self, intermediate_data):
+    #     import re
+    #     root = "web"
+    #     manga_type = ["manga", "magazine"]
+    #     for type in intermediate_data:
+    #         path = "db/anime/"
+    #         if type in manga_type:
+    #             path = "db/manga/"
+    #         path += str(re.escape(type))
+    #         for categories in intermediate_data[type]:
+    #             dir_path = path + "/" + str(re.escape(categories))
+    #             self.create_dir(dir_path)
+    #             for data in intermediate_data[type][categories]:
+    #                 des_file = dir_path + "/" + re.escape(data) + ".json"
+    #                 with open(des_file, "w+") as jsonfile:
+    #                     jsonfile.write(json.dumps(intermediate_data[type][categories][data]))
 
     def intermediate_transform_v2(self, json_data):
         inter_data = {}
+        inter_data[self.ALL_MANGA] = {}
+        inter_data[self.ALL_ANIME] = {}
         for data in json_data:
-            type = data  # TV, OVA, MOVIE , MANGA ,MAGAZINE...
-            if type not in inter_data:
-                inter_data[type] = {}
-                inter_data[type][self.ALL] = {}
+            media = data  # TV, OVA, MOVIE , MANGA ,MAGAZINE...
+            if media not in inter_data:
+                inter_data[media] = {}
+                inter_data[media][self.ALL] = {}
             for anime in json_data[data]:
                 genres = [self.UNKNOWN_GENRE]
                 themes = [self.UNKNOWN_THEME]
                 anime_name = anime[self.ATTR_NAME]
-                # add the anime to ALL in the type hierarchy
-                inter_data[type][self.ALL][anime_name] = self.gen_zoom_node()
+
+                if media in self.MANGA_TYPE:
+                    inter_data[self.ALL_MANGA][anime_name] = self.gen_zoom_node()
+                else:
+                    inter_data[self.ALL_ANIME][anime_name] = self.gen_zoom_node()
+
+                # add the anime to ALL in the media hierarchy
+                inter_data[media][self.ALL][anime_name] = self.gen_zoom_node()
                 if len(anime[self.ATTR_GENRE]) > 0:
                     genres = anime[self.ATTR_GENRE]
                 if len(anime[self.ATTR_THEMES]) > 0:
                     themes = anime[self.ATTR_THEMES]
                 for genre in genres:
-                    if genre not in inter_data[type]:
-                        inter_data[type][genre] = {}
-                        inter_data[type][genre][self.ALL] = {}
+                    if genre not in inter_data[media]:
+                        inter_data[media][genre] = {}
+                        inter_data[media][genre][self.ALL] = {}
                     # add the anime to ALL in the genre hierarchy
-                    inter_data[type][genre][self.ALL][anime_name] = self.gen_zoom_node()
+                    inter_data[media][genre][self.ALL][anime_name] = self.gen_zoom_node()
                     for theme in themes:
-                        if theme not in inter_data[type][genre]:
-                            inter_data[type][genre][theme] = {}
-                        inter_data[type][genre][theme][anime_name] = self.gen_zoom_node()
-        self.gen_zoomed_view_v2(inter_data)
+                        if theme not in inter_data[media][genre]:
+                            inter_data[media][genre][theme] = {}
+                        inter_data[media][genre][theme][anime_name] = self.gen_zoom_node()
+        self.gen_overview_forced_layout(inter_data)
 
-    def gen_zoomed_view_v2(self, intermediate_data_v2):
-        manga_type = ["manga", "magazine"]
+    def gen_overview_forced_layout(self, intermediate_data_v2):
         root = "web/db"
         anime_media = {}
         manga_media = {}
@@ -326,69 +336,84 @@ class Transform:
         manga_all_genre = {}
         anime_all_theme = {}
         manga_all_theme = {}
-        for type in intermediate_data_v2:
-            category = "anime"
-            if type in manga_type:
-                category = "manga"
-            if category == "anime":
-                anime_media[type] = {}
+
+        for media in intermediate_data_v2:
+
+            if media == self.ALL_ANIME:
+                path = root + "/" + self.ANIME
+                self.create_anime_json(intermediate_data_v2[media].keys(), path, self.ANIME)
+            elif media == self.ALL_MANGA:
+                path = root + "/" + self.MANGA
+                self.create_anime_json(intermediate_data_v2[media].keys(), path, self.MANGA)
             else:
-                manga_media[type] = {}
-
-            for genre in intermediate_data_v2[type]:
-                if category == "anime":
-                    anime_all_genre[genre] = {}
+                category = self.ANIME
+                if media in self.MANGA_TYPE:
+                    category = self.MANGA
+                if category == self.ANIME:
+                    anime_media[media] = {}
                 else:
-                    manga_all_genre[genre] = {}
-                if genre == "all":
-                    path = root + "/" + category + "/" + type + "/"
-                    self.create_anime_json(category, genre, intermediate_data_v2[type][genre].keys(), path,
-                                           theme, type)
-                else:
-                    for theme in intermediate_data_v2[type][genre]:
-                        if category == "anime":
-                            anime_all_theme[theme] = {}
-                        else:
-                            manga_all_theme[theme] = {}
+                    manga_media[media] = {}
 
-                        path = root + "/" + category + "/" + type + "/" + genre.replace("/", "") + "/" + theme.replace(
-                            "/",
-                            "")
-                        if theme == "all":
-                            path = root + "/" + category + "/" + type + "/" + genre.replace("/", "")
-                        self.create_anime_json(category, genre, intermediate_data_v2[type][genre][theme].keys(), path,
-                                               theme, type)
-        #for anime data
-        path = root + "/" + "anime"
+                for genre in intermediate_data_v2[media]:
+                    if category == self.ANIME:
+                        anime_all_genre[genre] = {}
+                    else:
+                        manga_all_genre[genre] = {}
+                    if genre == "all":
+                        path = root + "/" + category + "/" + media + "/"
+                        self.create_anime_json(intermediate_data_v2[media][genre].keys(), path, category, media)
+                    else:
+                        for theme in intermediate_data_v2[media][genre]:
+                            if category == self.ANIME:
+                                anime_all_theme[theme] = {}
+                            else:
+                                manga_all_theme[theme] = {}
+
+                            path = root + "/" + category + "/" + media + "/" + genre.replace("/",
+                                                                                             "") + "/" + theme.replace(
+                                "/",
+                                "")
+                            if theme == "all":
+                                path = root + "/" + category + "/" + media + "/" + genre.replace("/", "")
+                                self.create_anime_json(intermediate_data_v2[media][genre][theme].keys(), path, category,
+                                                       media,
+                                                       genre)
+                            else:
+                                self.create_anime_json(intermediate_data_v2[media][genre][theme].keys(), path, category,
+                                                       media,
+                                                       genre, theme)
+        # for anime data
+        path = root + "/" + self.ANIME
         self.create_file(path + "/media.json", anime_media)
         self.create_file(path + "/theme.json", anime_all_theme)
         self.create_file(path + "/genre.json", anime_all_genre)
 
-        #for Manga data
-        path = root + "/" + "manga"
+        # for Manga data
+        path = root + "/" + self.MANGA
         self.create_file(path + "/media.json", manga_media)
         self.create_file(path + "/theme.json", manga_all_theme)
         self.create_file(path + "/genre.json", manga_all_genre)
 
-    def create_anime_json(self, category, genre, anime_list, path, theme, type):
+    def create_anime_json(self, anime_list, path, category, media=None, genre=None, theme=None):
         self.create_dir(path)
         des_file = path + "/" + "anime.json"
-        leafs_json = []
+        root_json = []
         for key in anime_list:
-            leafs_json.append(self.gen_leaf_node(key, "isMovie"))
-        theme_json = self.gen_default_node(theme, "isTheme", leafs_json)
-        genre_json = self.gen_default_node(genre, "isGenre", [theme_json])
-        media_json = self.gen_default_node(type, "isMedia", [genre_json])
-        root_json = self.gen_default_node(category, "isRoot", [media_json])
+            root_json.append(self.gen_leaf_node(key, "isMovie"))
+        if theme:
+            root_json = self.gen_default_node(theme, "isTheme", root_json)
+        if genre:
+            root_json = self.gen_default_node(genre, "isGenre", [root_json])
+        if media:
+            root_json = self.gen_default_node(media, "isMedia", [root_json])
+
+        root_json = self.gen_default_node(category, "isRoot", [root_json])
         self.create_file(des_file, root_json)
 
     def create_file(self, des_file, dict_data):
         with open(des_file, "w+") as jsonfile:
-            # jsonfile.write(json.dumps(intermediate_data_v2[type][genre][theme]))
+            # jsonfile.write(json.dumps(intermediate_data_v2[media][genre][theme]))
             jsonfile.write(json.dumps(dict_data))
-
-    def gen_overview_forced_layout(self, intermediate_data):
-        manga_type = ["manga", "magazine"]
 
     def create_dir(self, dir_name):
         import os
