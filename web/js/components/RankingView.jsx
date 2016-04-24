@@ -98,11 +98,8 @@ var RankingView = React.createClass({
   visualize() {
     var rects = [];
     // get all rectangles for update
-    var fieldList = Utils.getSortedFieldsList(indexByDomain);
-    console.log(indexByDomain);
-    console.log(fieldList);
-    for (var i = 0; i < fieldList.length; ++i) {
-      var key = fieldList[i];
+    // var fieldList = Utils.getSortedFieldsList(indexByDomain);
+    for (var key in indexByDomain) {
       if (indexByDomain.hasOwnProperty(key)) {
         var parts = key.split("_");
         if (parts.length == 2) {
