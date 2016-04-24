@@ -98,7 +98,11 @@ var RankingView = React.createClass({
   visualize() {
     var rects = [];
     // get all rectangles for update
-    for (var key in indexByDomain) {
+    var fieldList = Utils.getSortedFieldsList(indexByDomain);
+    console.log(indexByDomain);
+    console.log(fieldList);
+    for (var i = 0; i < fieldList.length; ++i) {
+      var key = fieldList[i];
       if (indexByDomain.hasOwnProperty(key)) {
         var parts = key.split("_");
         if (parts.length == 2) {
@@ -136,18 +140,29 @@ var RankingView = React.createClass({
     // displayed it doesn't include the lower bound.
     var result = mid;
     var loVal = Utils.pointOneFloor(midVal);
+      console.log("howdy");
     if (ratings[mid]["rating"] > loVal) {
       var prev = result;
+      console.log("howdy");
       while (result <= hi && ratings[result]["rating"] > loVal) {
         prev = result;
         result += 1;
       }
+      console.log("result: " + result);
       result = prev;
     }
     else {// could only be equal
+      // search backward
+      var tmp = result;
       while (result >= 0 && ratings[result]["rating"] == loVal) {
         result -= 1;
       }
+      if (result >= 0) return result;
+      // search forward
+      while (tmp <= hi && ratings[tmp]["rating"] == loVal) {
+        tmp += 1
+      }
+      if (tmp <= hi) result = tmp;
     }
     return result
   },
@@ -172,12 +187,16 @@ var RankingView = React.createClass({
       // delete the original range, and insert two new ranges that
       // are halves from the original range
       var ilo = indices[0], ihi = indices[1], mid = component.findDivideIndex(ratings, ilo, ihi)
-      if (ilo < ihi && mid + 1 <= ihi) {
+      console.log("ilo: " + ilo + " ihi: " + ihi + " mid: " + mid);
+      if (ilo < ihi && mid + 1 <= ihi && ilo <= mid) {
         delete indexByDomain[key];
+
         var minmaxLo = component.minmaxWithinIndices(ratings, ilo, mid);
         component.insertIndexByRange(minmaxLo, ilo, mid);
+
         var minmaxHi = component.minmaxWithinIndices(ratings, mid + 1, ihi);
         component.insertIndexByRange(minmaxHi, mid + 1, ihi);
+
         component.visualize();
       }
     })
@@ -190,6 +209,8 @@ var RankingView = React.createClass({
     });
 
     rects.exit().transition().duration(1000).remove();
+
+    rects.attr("fill", "purple");
 
     rects.transition().duration(1000)
     .attr("x", function(d) { return d.x + hp; })
