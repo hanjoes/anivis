@@ -16,11 +16,24 @@ div.tooltip {
   width: 60px;
   height: 28px;
   padding: 2px;
-  font: 12px sans-serif;
   background: lightsteelblue;
   border: 0px;
   border-radius: 8px;
   pointer-events: none;
+    .style("left", "1000px")
+    .style("top", "30px");
+}
+
+div#detail {
+  position: absolute;
+  text-align: left;
+  padding: 10px;
+  border: 1px;
+  border-style: solid;
+  border-color: purple;
+  border-radius: 8px;
+  left: 1100px;
+  top: 120px;
 }
 
 body {
@@ -61,4 +74,14 @@ line.link {
 
 .rankingRect:hover {
   cursor: pointer;
+}
+
+ul, li {
+  display: inline;
+}
+
+div#details {
+  position: absolute;
+  top: 0;
+  left: 3000;
 }

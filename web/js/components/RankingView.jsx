@@ -1,7 +1,7 @@
 var d3 = require('d3');
 var React = require('react');
 
-var vis, w, h, yScale, yAxis, yAxisGroup, indexByDomain;
+var vis, w, h, yScale, yAxis, yAxisGroup, indexByDomain, tooltip;
 
 var RECT_HORIZONTAL_PADDING = 15;
 
@@ -23,11 +23,15 @@ var RankingView = React.createClass({
     yAxis = d3.svg.axis()
     .scale(yScale)
     .orient("left")
-    .ticks(5, "s")
+    .ticks(10, "s")
     .outerTickSize(1);
     yAxisGroup = vis.append("g")
     .attr("class", "axis")
     .attr("transform", "translate(10,0)");
+
+    tooltip = d3.select("body").append("div" )
+    .attr("id", "detail")
+    .style("opacity", 0);
   },
 
   componentDidUpdate() {
@@ -82,8 +86,6 @@ var RankingView = React.createClass({
   },
 
   visualize() {
-    console.log("visualizing: ");
-    console.log(indexByDomain);
     var rects = [];
     // get all rectangles for update
     for (var key in indexByDomain) {
@@ -99,6 +101,19 @@ var RankingView = React.createClass({
       }
     }
     this.visualizeRects(rects);
+  },
+
+  getAnimeList(ratings, lo, hi) {
+    var items = ""
+    for (var i = lo; i <= hi; ++i) {
+      ratings[i]
+      items += this.getAnimeListItem(ratings[i])
+    }
+    return "<ul>" + items + "</ul>"
+  },
+
+  getAnimeListItem(ratingItem) {
+    return "</br><li>" + ratingItem["anime"]["name"] + "</li>"
   },
 
   visualizeRects(rectData) {
@@ -121,9 +136,16 @@ var RankingView = React.createClass({
       var minmaxLo = component.minmaxWithinIndices(ratings, ilo, mid);
       component.insertIndexByRange(minmaxLo, ilo, mid);
       var minmaxHi = component.minmaxWithinIndices(ratings, mid, ihi);
-      component.insertIndexByRange(minmaxHi, mid, ihi);
+      component.insertIndexByRange(minmaxHi, mid + 1, ihi);
 
       component.visualize();
+    })
+    .on("mouseover", function(d) {
+      var key = d.lo + "_" + d.hi;
+      var indices = indexByDomain[key];
+      tooltip.transition().duration(200).style("opacity", .9);
+      var detailList = component.getAnimeList(ratings, indices[0], indices[1]);
+      tooltip.html(detailList);
     });
 
     rects.exit().transition().duration(1000).remove();

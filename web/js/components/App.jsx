@@ -3,6 +3,7 @@ var React = require('react');
 var Search = require('./Search.jsx');
 var Filter = require('./Filter.jsx');
 var TreeView = require('./TreeView.jsx');
+var DetailsView = require('./DetailsView.jsx');
 var RankingView = require('./RankingView.jsx');
 // js modules
 var Actions = require('../actions/Actions');
@@ -97,6 +98,7 @@ var App = React.createClass({
 
       <TreeView root={this.state.root}/>
       <RankingView ranks={this.state.ranks}/>
+      {/*<DetailsView />*/}
       </div>
     );
   }
