@@ -2,9 +2,10 @@ var d3 = require('d3');
 var React = require('react');
 var Utils = require('../utils/Utils');
 
-var vis, w, h, yScale, yAxis, yAxisGroup, indexByDomain, tooltip;
+var vis, w, h, yScale, yAxis, yAxisGroup, indexByDomain, tooltip, redScale;
 
 var RECT_HORIZONTAL_PADDING = 15;
+var RED_DOMAIN_HI = 5;
 
 var RankingView = React.createClass({
   componentDidMount() {
@@ -20,6 +21,7 @@ var RankingView = React.createClass({
 
     indexByDomain = {};
     yScale = d3.scale.linear().range([h, 0]).domain([0, 10]);
+    redScale = d3.scale.linear().range([0, 128]).domain([0, RED_DOMAIN_HI]);
 
     yAxis = d3.svg.axis()
     .scale(yScale)
@@ -109,7 +111,8 @@ var RankingView = React.createClass({
           }
           var yMin = yScale(hiVal);
           var yMax = yScale(loVal);
-          rects.push({x: 0, y: yMin, w: w, h: yMax - yMin, lo: lo, hi: hi});
+          var num = indexByDomain[key][1] - indexByDomain[key][0] + 1;
+          rects.push({x: 0, y: yMin, w: w, h: yMax - yMin, lo: lo, hi: hi, n: num});
         }
       }
     }
@@ -193,7 +196,10 @@ var RankingView = React.createClass({
     .attr("y", function(d) { return d.y; })
     .attr("width", function(d) { return d.w - 2 * hp; })
     .attr("height", function(d) { return d.h; })
-    .attr("fill", "purple")
+    .attr("fill", function(d) {
+      var num = Math.min(RED_DOMAIN_HI, d.n)
+      return "rgb(" + redScale(num) + ",0,128)";
+    })
     .attr("stroke", "black")
   },
 
