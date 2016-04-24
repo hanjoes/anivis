@@ -320,22 +320,55 @@ class Transform:
     def gen_zoomed_view_v2(self, intermediate_data_v2):
         manga_type = ["manga", "magazine"]
         root = "web/db"
+        anime_media = {}
+        manga_media = {}
+        anime_all_genre = {}
+        manga_all_genre = {}
+        anime_all_theme = {}
+        manga_all_theme = {}
         for type in intermediate_data_v2:
             category = "anime"
             if type in manga_type:
                 category = "manga"
+            if category == "anime":
+                anime_media[type] = {}
+            else:
+                manga_media[type] = {}
+
             for genre in intermediate_data_v2[type]:
+                if category == "anime":
+                    anime_all_genre[genre] = {}
+                else:
+                    manga_all_genre[genre] = {}
                 if genre == "all":
-                    path = root + "/" + category + "/" + type + "/" + genre.replace("/", "")
+                    path = root + "/" + category + "/" + type + "/"
                     self.create_anime_json(category, genre, intermediate_data_v2[type][genre].keys(), path,
                                            theme, type)
                 else:
                     for theme in intermediate_data_v2[type][genre]:
+                        if category == "anime":
+                            anime_all_theme[theme] = {}
+                        else:
+                            manga_all_theme[theme] = {}
+
                         path = root + "/" + category + "/" + type + "/" + genre.replace("/", "") + "/" + theme.replace(
                             "/",
                             "")
+                        if theme == "all":
+                            path = root + "/" + category + "/" + type + "/" + genre.replace("/", "")
                         self.create_anime_json(category, genre, intermediate_data_v2[type][genre][theme].keys(), path,
                                                theme, type)
+        #for anime data
+        path = root + "/" + "anime"
+        self.create_file(path + "/media.json", anime_media)
+        self.create_file(path + "/theme.json", anime_all_theme)
+        self.create_file(path + "/genre.json", anime_all_genre)
+
+        #for Manga data
+        path = root + "/" + "manga"
+        self.create_file(path + "/media.json", manga_media)
+        self.create_file(path + "/theme.json", manga_all_theme)
+        self.create_file(path + "/genre.json", manga_all_genre)
 
     def create_anime_json(self, category, genre, anime_list, path, theme, type):
         self.create_dir(path)
@@ -347,9 +380,12 @@ class Transform:
         genre_json = self.gen_default_node(genre, "isGenre", [theme_json])
         media_json = self.gen_default_node(type, "isMedia", [genre_json])
         root_json = self.gen_default_node(category, "isRoot", [media_json])
+        self.create_file(des_file, root_json)
+
+    def create_file(self, des_file, dict_data):
         with open(des_file, "w+") as jsonfile:
             # jsonfile.write(json.dumps(intermediate_data_v2[type][genre][theme]))
-            jsonfile.write(json.dumps(root_json))
+            jsonfile.write(json.dumps(dict_data))
 
     def gen_overview_forced_layout(self, intermediate_data):
         manga_type = ["manga", "magazine"]
