@@ -72,6 +72,11 @@ line.link {
   shape-rendering: crispEdges;
 }
 
+.axis .minor {
+  stroke: gray;
+  stroke-width: 1px;
+}
+
 .rankingRect:hover {
   cursor: pointer;
 }
