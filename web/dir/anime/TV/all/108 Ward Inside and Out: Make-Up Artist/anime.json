@@ -1,0 +1,23 @@
+{
+  "name": "anime",
+  "isRoot": "yes",
+  "children": [
+    {
+      "isMedia": "yes",
+      "name": "TV",
+      "children": [
+        {
+          "isGenre": "yes",
+          "name": "all",
+          "children": [
+            {
+              "isTheme": "yes",
+              "name": "108 Ward Inside and Out: Make-Up Artist",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

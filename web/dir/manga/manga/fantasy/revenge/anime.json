@@ -1,0 +1,1 @@
+{"name": "manga", "isRoot": "yes", "children": [{"isMedia": "yes", "name": "manga", "children": [{"isGenre": "yes", "name": "fantasy", "children": [{"isTheme": "yes", "name": "revenge", "children": [{"isMovie": "yes", "name": "Gankutsuou"}, {"isMovie": "yes", "name": "Suikoden III"}, {"isMovie": "yes", "name": "\u00dcbel Blatt"}, {"isMovie": "yes", "name": "Berserk"}]}]}]}]}
