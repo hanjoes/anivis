@@ -21,7 +21,7 @@ module.exports = {
     //   callback && callback(data);
     // });
 
-    d3.json("../../data/json/flare.json", function(data) {
+    d3.json("../../data/json/anime.json", function(data) {
       callback && callback(data);
     });
   },

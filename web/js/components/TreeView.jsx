@@ -15,9 +15,13 @@ var TreeView = React.createClass({
 
     this.force = d3.layout.force()
     .on("tick", this.tick)
-    .charge(function(d) { return d._children ? -d.size / 100 : -30; })
-    .linkDistance(function(d) { return d.target._children ? 80 : 30; })
+    .charge(function(d) { return -30; })
+    .linkDistance(function(d) { return 30; })
     .size([this.w, this.h - 160]);
+
+    this.tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
   },
 
   visualize() {
@@ -51,20 +55,38 @@ var TreeView = React.createClass({
     .style("fill", this.color);
 
     this.node.transition()
-    .attr("r", function(d) { return d.children ? 4.5 : Math.sqrt(d.size) / 10; });
+    .attr("r", function(d) { return 4.5; });
 
     // Enter any new nodes.
     this.node.enter().append("svg:circle")
     .attr("class", "node")
     .attr("cx", function(d) { return d.x; })
     .attr("cy", function(d) { return d.y; })
-    .attr("r", function(d) { return d.children ? 4.5 : Math.sqrt(d.size) / 10; })
+    .attr("r", function(d) { return 4.5; })
     .style("fill", this.color)
     .on("click", this.click)
+    .on("mouseover", this.mouseover)
+    .on("mouseout", this.mouseout)
     .call(this.force.drag);
 
     // Exit any old nodes.
     this.node.exit().remove();
+  },
+
+  mouseover(datum) {
+    this.tooltip.transition()
+    .duration(200)
+    .style("opacity", .9);
+    this.tooltip.html(datum.name)
+    .style("left", (d3.event.pageX) + "px")
+    .style("top", (d3.event.pageY - 28) + "px");
+
+  },
+
+  mouseout(datum) {
+    this.tooltip.transition()
+    .duration(500)
+    .style("opacity", 0);
   },
 
   tick() {
@@ -99,18 +121,16 @@ var TreeView = React.createClass({
     var nodes = [], i = 0;
 
     function recurse(node) {
-      if (node.children) node.size = node.children.reduce(function(p, v) { return p + recurse(v); }, 0);
+      if (node.children) node.children.forEach(recurse);
       if (!node.id) node.id = ++i;
       nodes.push(node);
-      return node.size;
     }
 
-    root.size = recurse(root);
+    recurse(root);
     return nodes;
   },
 
   componentDidUpdate() {
-    // this.visualize();
     if (this.props.root) {
       this.root = this.props.root;
       this.root.fixed = true;
