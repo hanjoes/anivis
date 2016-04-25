@@ -1,0 +1,1 @@
+{"name": "manga", "isRoot": "yes", "children": [{"isMedia": "yes", "name": "manga", "children": [{"isGenre": "yes", "name": "mystery", "children": [{"isTheme": "yes", "name": "historical", "children": [{"isMovie": "yes", "name": "Phantom Thief Jeanne"}, {"isMovie": "yes", "name": "Devils and Realist"}, {"isMovie": "yes", "name": "Tetragrammaton Labyrinth"}]}]}]}]}
