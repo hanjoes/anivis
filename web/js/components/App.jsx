@@ -12,7 +12,8 @@ var App = React.createClass({
   getInitialState() {
     return {
       searchText: "",
-      attributes: {}
+      filters: [],// contains all filters, each filter will be assigned one.
+      categories: {}// contains all categories for each filter, each fillter will get one
     }
   },
 
@@ -22,50 +23,64 @@ var App = React.createClass({
     });
   },
 
-  handleFilterAction(attribute, selectedCategory) {
-    // flip the value
-    // var oldStats = this.attributes[attribute];
-    // var newStats = []
-    // oldStats.forEach(function(stat) {
-    //   if (stat.hasOwnProperty(selectedCategory)) {
-    //     stat[selectedCategory] = true;
-    //   }
-    //   newStats.push(stat);
-    // });
-    // this.attributes[attribute] = newStats;
+  handleFilterAction(filterModified, selectedOption) {
+    var _c = this;
+    // two things should happen when updating the filters:
+    // 1. we should update other filters if it is the first filter value
+    // that is changed.
+    // 2. if we are selecting options that are not from the first filter,
+    // we need to update data for the TreeView *if* we can form a valid path.
 
-    var component = this;
+    // updating other filters, only when we are modifying the first filter
+    if (filterModified["name"] === "Types") {
+      Actions.getCategoriesForType(selectedOption, function(data, filterName) {
+        var categories = []
+        for (var key in data) {
+          if (data.hasOwnProperty(key)) {
+            categories.push(key);
+          }
+        }
+        _c.categories[filterName] = categories;
+        _c.setState({
+          categories: _c.categories
+        });
+        return;
+      });
+    }
+
+    // updating data
     Actions.getFilteredData([], function(data) {
-      component.setState({
+      _c.setState({
         root: data,
       });
     });
   },
 
   componentWillMount() {
-    var component = this;
-    var filters = Actions.getAttributes(function(data) {
-      var filters = data["filters"];
-      component.attributes = {};
-      filters.forEach(function(attribute) {
-        component.attributes[attribute["name"]] = [];
-        attribute["attributes"].forEach(function(attributeName) {
-          var categoryStat = {};
-          categoryStat[attributeName] = false;
-          component.attributes[attribute["name"]].push(categoryStat);
-        });
+    var _c = this;
+    _c.categories = {};
+    ////////////////////// initialize filters
+    var filterAttrs = Actions.getInitialFilterStates(function(data) {
+      var filterConfigs = data["filters"];
+      var filters = []
+      filterConfigs.forEach(function(filterConfig) {
+        filters.push(filterConfig);
       });
-      component.setState({ attributes: component.attributes });
+      _c.setState({
+        filters: filters
+      });
     });
 
+    ////////////////////// initialize data
     Actions.getFilteredData([], function(data) {
-      component.setState({
+      _c.setState({
         root: data,
       });
     });
 
+    ////////////////////// initialize rankings
     Actions.getRankedAnimes(function(data) {
-      component.setState({
+      _c.setState({
         ranks: data,
       });
     });
@@ -73,17 +88,16 @@ var App = React.createClass({
 
   render() {
     var filters = [];
-    for (var key in this.attributes) {
-      if (this.attributes.hasOwnProperty(key)) {
-        filters.push(<Filter
-          attribute={key}
-          categories={this.attributes[key]}
-          inputHandler={this.handleFilterAction}
-          key={key}
-          />
-        );
-      }
-    }
+    var _c = this;
+    this.state.filters.forEach(function(filter) {
+      filters.push(<Filter
+        filter={filter}
+        categories={_c.categories[filter["name"]]}
+        inputHandler={_c.handleFilterAction}
+        key={"filter_" + filter["name"]}
+        />
+      );
+    });
 
     return (
       <div>
