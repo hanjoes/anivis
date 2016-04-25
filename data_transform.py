@@ -30,6 +30,7 @@ class Transform:
     TAG_ANN = "ann"
     TAG_ANIME = "anime"
     TAG_INFO = "info"
+    TAG_RATING = "ratings"
     TAG_MANGA = "manga"
 
     TAG_ATTR_NAME = "name"
@@ -37,6 +38,7 @@ class Transform:
     TAG_VALUE = "value"  # data contained with in the tag
     TAG_ATTR_TYPE_GENRES = "Genres"
     TAG_ATTR_TYPE_THEMES = "Themes"
+    TAG_ATTR_WEIGHTED_SCORE = "weighted_score"
 
     MOVIES = "movies"
     MANGA = "manga"
@@ -60,6 +62,9 @@ class Transform:
     ALL_MANGA = "all_manga"
     ALL_ANIME = "all_anime"
     MANGA_TYPE = ["manga", "magazine"]
+    SUMMARY = "summary"
+    RATINGS = "ratings"
+    IMAGE = "image"
 
     def __init__(self):
         pass
@@ -96,9 +101,20 @@ class Transform:
             return tag_node.attrib[attib_name]
         return self.UNKNOWN
 
-    # create handle method for each tag you want to process
+    # create handler method for each tag you want to process
     def handle_tag(self, tag_node, anime_info):
         self.handle_info_tags(tag_node, anime_info)
+        self.handle_rating_tags(tag_node, anime_info)
+
+    # handler for rating info
+    def handle_rating_tags(self, tag_node, anime_info):
+        anime_info[self.TAG_RATING] = "0"
+        for rating in tag_node.findall(self.TAG_RATING):
+            if self.TAG_ATTR_WEIGHTED_SCORE not in rating.attrib:
+                continue
+            rating_value = rating.attrib[self.TAG_ATTR_WEIGHTED_SCORE]
+            if rating_value:
+                anime_info[self.TAG_RATING] = rating_value
 
     # handler for different information that are to be in the <info> tag
     def handle_info_tags(self, root, anime_info):
@@ -223,11 +239,14 @@ class Transform:
     def gen_default_node(self, name, _type, _children):
         return {self.NAME: name, _type: "yes", self.CHILDREN: _children}
 
-    def gen_zoom_node(self):
-        return {}
+    def gen_zoom_node(self, summary, image, rating):
+        return {self.SUMMARY: summary, self.IMAGE: image, self.TAG_RATING: rating}
 
-    def gen_leaf_node(self, name, _type):
+    def gen_leaf_anime_node(self, name, _type):
         return {self.NAME: name, _type: "yes"}
+
+    def gen_leaf_rating_node(self, name, rating):
+        return {self.TAG_RATING: rating, self.ANIME: {self.NAME: name}}
 
     def gen_default_leaf(self, name):
         return {self.NAME: name, self.IS_ROOT: self.FALSE, self.IS_LEAF: self.TRUE}
@@ -304,14 +323,15 @@ class Transform:
                 genres = [self.UNKNOWN_GENRE]
                 themes = [self.UNKNOWN_THEME]
                 anime_name = anime[self.ATTR_NAME]
-
+                anime_rating = anime[self.TAG_RATING]
+                anime_details = self.gen_zoom_node("TBD", "TBD", anime_rating)
                 if media in self.MANGA_TYPE:
-                    inter_data[self.ALL_MANGA][anime_name] = self.gen_zoom_node()
+                    inter_data[self.ALL_MANGA][anime_name] = anime_details
                 else:
-                    inter_data[self.ALL_ANIME][anime_name] = self.gen_zoom_node()
+                    inter_data[self.ALL_ANIME][anime_name] = anime_details
 
                 # add the anime to ALL in the media hierarchy
-                inter_data[media][self.ALL][anime_name] = self.gen_zoom_node()
+                inter_data[media][self.ALL][anime_name] = anime_details
                 if len(anime[self.ATTR_GENRE]) > 0:
                     genres = anime[self.ATTR_GENRE]
                 if len(anime[self.ATTR_THEMES]) > 0:
@@ -321,11 +341,11 @@ class Transform:
                         inter_data[media][genre] = {}
                         inter_data[media][genre][self.ALL] = {}
                     # add the anime to ALL in the genre hierarchy
-                    inter_data[media][genre][self.ALL][anime_name] = self.gen_zoom_node()
+                    inter_data[media][genre][self.ALL][anime_name] = anime_details
                     for theme in themes:
                         if theme not in inter_data[media][genre]:
                             inter_data[media][genre][theme] = {}
-                        inter_data[media][genre][theme][anime_name] = self.gen_zoom_node()
+                        inter_data[media][genre][theme][anime_name] = anime_details
         self.gen_overview_forced_layout(inter_data)
 
     def gen_overview_forced_layout(self, intermediate_data_v2):
@@ -341,10 +361,10 @@ class Transform:
 
             if media == self.ALL_ANIME:
                 path = root + "/" + self.ANIME
-                self.create_anime_json(intermediate_data_v2[media].keys(), path, self.ANIME)
+                self.create_anime_json(intermediate_data_v2[media], path, self.ANIME)
             elif media == self.ALL_MANGA:
                 path = root + "/" + self.MANGA
-                self.create_anime_json(intermediate_data_v2[media].keys(), path, self.MANGA)
+                self.create_anime_json(intermediate_data_v2[media], path, self.MANGA)
             else:
                 category = self.ANIME
                 if media in self.MANGA_TYPE:
@@ -361,7 +381,7 @@ class Transform:
                         manga_all_genre[genre] = {}
                     if genre == "all":
                         path = root + "/" + category + "/" + media + "/"
-                        self.create_anime_json(intermediate_data_v2[media][genre].keys(), path, category, media)
+                        self.create_anime_json(intermediate_data_v2[media][genre], path, category, media)
                     else:
                         for theme in intermediate_data_v2[media][genre]:
                             if category == self.ANIME:
@@ -375,11 +395,11 @@ class Transform:
                                 "")
                             if theme == "all":
                                 path = root + "/" + category + "/" + media + "/" + genre.replace("/", "")
-                                self.create_anime_json(intermediate_data_v2[media][genre][theme].keys(), path, category,
+                                self.create_anime_json(intermediate_data_v2[media][genre][theme], path, category,
                                                        media,
                                                        genre)
                             else:
-                                self.create_anime_json(intermediate_data_v2[media][genre][theme].keys(), path, category,
+                                self.create_anime_json(intermediate_data_v2[media][genre][theme], path, category,
                                                        media,
                                                        genre, theme)
         # for anime data
@@ -394,21 +414,28 @@ class Transform:
         self.create_file(path + "/theme.json", manga_all_theme)
         self.create_file(path + "/genre.json", manga_all_genre)
 
-    def create_anime_json(self, anime_list, path, category, media=None, genre=None, theme=None):
+    def create_anime_json(self, animes, path, category, media=None, genre=None, theme=None):
         self.create_dir(path)
-        des_file = path + "/" + "anime.json"
+        des_anime_file = path + "/" + "anime.json"
+        des_rating_file = path + "/" + "rating.json"
         root_json = []
-        for key in anime_list:
-            root_json.append(self.gen_leaf_node(key, "isMovie"))
+        rating_data = []
+
+        for key in animes.keys():
+            root_json.append(self.gen_leaf_anime_node(key, "isMovie"))
+            rating_data.append(self.gen_leaf_rating_node(key, animes[key][self.TAG_RATING]))
         if theme:
             root_json = self.gen_default_node(theme, "isTheme", root_json)
         if genre:
             root_json = self.gen_default_node(genre, "isGenre", [root_json])
         if media:
             root_json = self.gen_default_node(media, "isMedia", [root_json])
-
         root_json = self.gen_default_node(category, "isRoot", [root_json])
-        self.create_file(des_file, root_json)
+
+        rating_data = sorted(rating_data, key=lambda k: k[self.TAG_RATING], reverse=True)
+
+        self.create_file(des_anime_file, root_json)
+        self.create_file(des_rating_file, {self.RATINGS: rating_data})
 
     def create_file(self, des_file, dict_data):
         with open(des_file, "w+") as jsonfile:
