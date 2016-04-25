@@ -132,3 +132,8 @@ node_modules/
 
 # Ignore built files
 scripts.min.js
+
+# Ignore data
+data/
+dir/
+db/
