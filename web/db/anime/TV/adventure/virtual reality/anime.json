@@ -1,1 +1,0 @@
-{"name": "anime", "isRoot": "yes", "children": [{"isMedia": "yes", "name": "TV", "children": [{"isGenre": "yes", "name": "adventure", "children": [{"isTheme": "yes", "name": "virtual reality", "children": [{"isMovie": "yes", "name": "Log Horizon"}, {"isMovie": "yes", "name": "Sword Art Online"}, {"isMovie": "yes", "name": "Grimgar of Fantasy and Ash"}]}]}]}]}

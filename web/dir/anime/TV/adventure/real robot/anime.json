@@ -1,1 +1,0 @@
-{"name": "anime", "isRoot": "yes", "children": [{"isMedia": "yes", "name": "TV", "children": [{"isGenre": "yes", "name": "adventure", "children": [{"isTheme": "yes", "name": "real robot", "children": [{"isMovie": "yes", "name": "Zoids"}, {"isMovie": "yes", "name": "Mars Daybreak"}]}]}]}]}

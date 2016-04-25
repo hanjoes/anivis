@@ -1,1 +1,0 @@
-{"name": "manga", "isRoot": "yes", "children": [{"isMedia": "yes", "name": "manga", "children": [{"isGenre": "yes", "name": "adventure", "children": [{"isTheme": "yes", "name": "military", "children": [{"isMovie": "yes", "name": "Suikoden III"}, {"isMovie": "yes", "name": "Submarine 707"}]}]}]}]}

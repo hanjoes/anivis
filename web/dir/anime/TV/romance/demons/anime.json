@@ -1,1 +1,0 @@
-{"name": "anime", "isRoot": "yes", "children": [{"isMedia": "yes", "name": "TV", "children": [{"isGenre": "yes", "name": "romance", "children": [{"isTheme": "yes", "name": "demons", "children": [{"isMovie": "yes", "name": "Strike the Blood"}, {"isMovie": "yes", "name": "Dance with Devils"}, {"isMovie": "yes", "name": "Asura Cryin' 2"}]}]}]}]}
