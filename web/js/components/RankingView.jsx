@@ -1,3 +1,5 @@
+require('d3-svg-legend');
+
 var d3 = require('d3');
 var React = require('react');
 var Utils = require('../utils/Utils');
@@ -5,13 +7,13 @@ var Utils = require('../utils/Utils');
 var vis, w, h, yScale, yAxis, yAxisGroup, indexByDomain, tooltip, redScale, grayScale;
 
 var RECT_HORIZONTAL_PADDING = 15;
-var RED_DOMAIN_HI = 20;
+var RED_DOMAIN_HI = 45;
 
 var RankingView = React.createClass({
 
   componentDidMount() {
     var m = {t:50,b:25,l:25,r:25};
-    w = 200 - m.l - m.r;
+    w = 260 - m.l - m.r;
     h = 800 - m.t - m.b;
 
     vis = d3.select("#ranking")
@@ -47,6 +49,23 @@ var RankingView = React.createClass({
     tooltip = d3.select("body").append("div" )
     .attr("id", "detail")
     .style("opacity", 0);
+
+    var log = d3.scale.linear()
+    .domain([0, 45])
+    .range(["rgb(0, 0, 128)", "rgb(150, 0, 128)"]);
+
+    d3.select("#ranking").append("g")
+    .attr("class", "legendLog")
+    .attr("transform", "translate(50,0)");
+
+    var logLegend = d3.legend.color()
+    .orient('horizontal')
+    .shapeWidth(30)
+    .cells([0, 15, 30, 45])
+    .scale(log);
+
+    d3.select(".legendLog")
+    .call(logLegend);
   },
 
   componentDidUpdate() {
@@ -213,7 +232,7 @@ var RankingView = React.createClass({
     rects.transition().duration(1000)
     .attr("x", function(d) { return d.x + hp; })
     .attr("y", function(d) { return d.y; })
-    .attr("width", function(d) { return d.w - 2 * hp; })
+    .attr("width", function(d) { return d.w - 5 * hp; })
     .attr("height", function(d) { return d.h; })
     .attr("fill", function(d) {
       var num = Math.min(RED_DOMAIN_HI, d.n)
