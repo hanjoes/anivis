@@ -15,8 +15,8 @@ var TreeView = React.createClass({
 
     this.force = d3.layout.force()
     .on("tick", this.tick)
-    .charge(function(d) { return -30; })
-    .linkDistance(function(d) { return 30; })
+    .charge(function(d) { return -5; })
+    .linkDistance(function(d) { return 15; })
     .size([this.w, this.h - 160]);
 
     this.tooltip = d3.select("body").append("div")

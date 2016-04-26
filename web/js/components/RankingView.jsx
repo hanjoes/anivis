@@ -21,7 +21,7 @@ var RankingView = React.createClass({
 
     indexByDomain = {};
     yScale = d3.scale.linear().range([h, 0]).domain([0, 10]);
-    redScale = d3.scale.linear().range([0, 128]).domain([0, RED_DOMAIN_HI]);
+    redScale = d3.scale.linear().range([0, 150]).domain([0, RED_DOMAIN_HI]);
 
     yAxis = d3.svg.axis()
     .scale(yScale)
@@ -81,10 +81,10 @@ var RankingView = React.createClass({
       return [];
     }
 
-    var minRating = ratings[lo]["rating"];
-    var maxRating = ratings[lo]["rating"];
+    var minRating = ratings[lo]["ratings"];
+    var maxRating = ratings[lo]["ratings"];
     for (var i = lo + 1; i <= hi; ++i) {
-      var cur = ratings[i]["rating"];
+      var cur = ratings[i]["ratings"];
       if (cur < minRating) {
         minRating = cur;
       }
@@ -131,15 +131,15 @@ var RankingView = React.createClass({
 
   findDivideIndex(ratings, lo, hi) {
     var mid = Math.floor(lo + (hi - lo) / 2);
-    var midVal = ratings[mid]["rating"];
+    var midVal = ratings[mid]["ratings"];
     // find the smallest value that is greater than Utils.pointOneCeil(midVal)
     // eventually mid should pointing to this value, since for a range
     // displayed it doesn't include the lower bound.
     var result = mid;
     var loVal = Utils.pointOneFloor(midVal);
-    if (ratings[mid]["rating"] > loVal) {
+    if (ratings[mid]["ratings"] > loVal) {
       var prev = result;
-      while (result <= hi && ratings[result]["rating"] > loVal) {
+      while (result <= hi && ratings[result]["ratings"] > loVal) {
         prev = result;
         result += 1;
       }
@@ -148,12 +148,12 @@ var RankingView = React.createClass({
     else {// could only be equal
       // search backward
       var tmp = result;
-      while (result >= 0 && ratings[result]["rating"] == loVal) {
+      while (result >= 0 && ratings[result]["ratings"] == loVal) {
         result -= 1;
       }
       if (result >= 0) return result;
       // search forward
-      while (tmp <= hi && ratings[tmp]["rating"] == loVal) {
+      while (tmp <= hi && ratings[tmp]["ratings"] == loVal) {
         tmp += 1
       }
       if (tmp <= hi) result = tmp;

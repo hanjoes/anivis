@@ -59,7 +59,7 @@ module.exports = {
   },
 
   getRankedAnimes(callback) {
-    d3.json("../../data/json/ratings.json", function(data) {
+    d3.json(BASE + "/anime/rating.json", function(data) {
       callback && callback(data);
     });
   }
