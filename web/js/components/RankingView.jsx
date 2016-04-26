@@ -2,12 +2,13 @@ var d3 = require('d3');
 var React = require('react');
 var Utils = require('../utils/Utils');
 
-var vis, w, h, yScale, yAxis, yAxisGroup, indexByDomain, tooltip, redScale;
+var vis, w, h, yScale, yAxis, yAxisGroup, indexByDomain, tooltip, redScale, grayScale;
 
 var RECT_HORIZONTAL_PADDING = 15;
 var RED_DOMAIN_HI = 20;
 
 var RankingView = React.createClass({
+
   componentDidMount() {
     var m = {t:50,b:25,l:25,r:25};
     w = 200 - m.l - m.r;
@@ -22,6 +23,7 @@ var RankingView = React.createClass({
     indexByDomain = {};
     yScale = d3.scale.linear().range([h, 0]).domain([0, 10]);
     redScale = d3.scale.linear().range([0, 150]).domain([0, RED_DOMAIN_HI]);
+    grayScale = d3.scale.linear().range([200, 0]).domain([0, 10]);
 
     yAxis = d3.svg.axis()
     .scale(yScale)
@@ -41,7 +43,7 @@ var RankingView = React.createClass({
     .attr("x2", -3)
     .attr("y2", yScale);
 
-      yAxisGroup.call(yAxis);
+    yAxisGroup.call(yAxis);
     tooltip = d3.select("body").append("div" )
     .attr("id", "detail")
     .style("opacity", 0);
@@ -121,10 +123,10 @@ var RankingView = React.createClass({
   },
 
   getAnimeList(ratings, lo, hi) {
-    var items = ""
+    var items = "";
     for (var i = lo; i <= hi; ++i) {
-      ratings[i]
-      items += this.getAnimeListItem(ratings[i])
+      ratings[i];
+      items += this.getAnimeListItem(ratings[i]);
     }
     return "<ul>" + items + "</ul>"
   },
@@ -162,7 +164,10 @@ var RankingView = React.createClass({
   },
 
   getAnimeListItem(ratingItem) {
-    return "</br><li>" + ratingItem["anime"]["name"] + "</li>"
+    var rating = ratingItem["ratings"];
+    var gray = grayScale(Math.floor(rating));
+    var color = "rgb(" + gray + "," + gray + "," + gray + ");";
+    return "</br><li>" + ratingItem["anime"]["name"] + ":<span class=\"rating\" style=\"color: " + color + "\">" + ratingItem["ratings"] + "</span></li>"
   },
 
   visualizeRects(rectData) {

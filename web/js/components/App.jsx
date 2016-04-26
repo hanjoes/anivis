@@ -13,13 +13,28 @@ var App = React.createClass({
     return {
       searchText: "",
       filters: [],// contains all filters, each filter will be assigned one.
-      categories: {}// contains all categories for each filter, each fillter will get one
+      categories: {},// contains all categories for each filter, each fillter will get one
+      animes: []
     }
+  },
+
+  maintainRankingViewState(rankingViewState) {
+    this.rankingViewState = rankingViewState;
+  },
+
+  getRankingViewState() {
+    return this.rankingViewState ? this.rankingViewState : {};
   },
 
   handleUserInput(searchText, attributes) {
     this.setState({
       searchText: searchText,
+    });
+  },
+
+  handleMouseHover(animeList) {
+    this.setState({
+      animes: animeList
     });
   },
 
@@ -117,16 +132,16 @@ var App = React.createClass({
       <h1>ANIVIS</h1>
       <hr></hr>
       <form>
-      <Search
+      {/*<Search
       searchText={this.state.searchText}
       inputHandler={this.handleUserInput}
-      />
+      />*/}
       {filters}
       </form>
 
       <TreeView root={this.state.root}/>
-      <RankingView ranks={this.state.ranks}/>
-      {/*<DetailsView />*/}
+      <RankingView hoverHandler={this.handleMouseHover} ranks={this.state.ranks}/>
+      {/*<DetailsView animes={this.state.animes}/>*/}
       </div>
     );
   }
