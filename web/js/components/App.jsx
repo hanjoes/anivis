@@ -25,6 +25,16 @@ var App = React.createClass({
 
   handleFilterAction(filterModified, selectedOption) {
     var _c = this;
+    var modifiedFilterName = filterModified["name"];
+
+    // ensure we update selected filters with the selected option,
+    // this will be used to construct the URL to the data file.
+    for (var i = 0; i < _c.selectedFilters.length; ++i) {
+      if (_c.selectedFilters[i]["name"] === modifiedFilterName) {
+        _c.selectedFilters[i]["selected"] = selectedOption;
+      }
+    }
+
     // two things should happen when updating the filters:
     // 1. we should update other filters if it is the first filter value
     // that is changed.
@@ -32,7 +42,7 @@ var App = React.createClass({
     // we need to update data for the TreeView *if* we can form a valid path.
 
     // updating other filters, only when we are modifying the first filter
-    if (filterModified["name"] === "Types") {
+    if (modifiedFilterName === "Types") {
       Actions.getCategoriesForType(selectedOption, function(data, filterName) {
         var categories = []
         for (var key in data) {
@@ -44,12 +54,10 @@ var App = React.createClass({
         _c.setState({
           categories: _c.categories
         });
-        return;
       });
     }
-
     // updating data
-    Actions.getFilteredData([], function(data) {
+    Actions.getFilteredData(_c.selectedFilters, function(data) {
       _c.setState({
         root: data,
       });
@@ -58,11 +66,16 @@ var App = React.createClass({
 
   componentWillMount() {
     var _c = this;
-    _c.categories = {};
+
     ////////////////////// initialize filters
     var filterAttrs = Actions.getInitialFilterStates(function(data) {
+      // initialize App fields
+      _c.categories = {};
+      _c.selectedFilters = data["filters"];
+
       var filterConfigs = data["filters"];
       var filters = []
+
       filterConfigs.forEach(function(filterConfig) {
         filters.push(filterConfig);
       });

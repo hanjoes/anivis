@@ -137,15 +137,12 @@ var RankingView = React.createClass({
     // displayed it doesn't include the lower bound.
     var result = mid;
     var loVal = Utils.pointOneFloor(midVal);
-      console.log("howdy");
     if (ratings[mid]["rating"] > loVal) {
       var prev = result;
-      console.log("howdy");
       while (result <= hi && ratings[result]["rating"] > loVal) {
         prev = result;
         result += 1;
       }
-      console.log("result: " + result);
       result = prev;
     }
     else {// could only be equal
@@ -184,7 +181,6 @@ var RankingView = React.createClass({
       // delete the original range, and insert two new ranges that
       // are halves from the original range
       var ilo = indices[0], ihi = indices[1], mid = component.findDivideIndex(ratings, ilo, ihi)
-      console.log("ilo: " + ilo + " ihi: " + ihi + " mid: " + mid);
       if (ilo < ihi && mid + 1 <= ihi && ilo <= mid) {
         delete indexByDomain[key];
 

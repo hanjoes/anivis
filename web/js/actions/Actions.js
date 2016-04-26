@@ -6,10 +6,10 @@ var BASE = 'db';
 var FILTER_INIT = {
   "filters":
   [
-    {"name": "Types", "message": "select a type", "preset": ["anime", "manga"]},
-    {"name": "Media", "message": "select a media", "preset": []},
-    {"name": "Genres", "message": "select a genre", "preset": []},
-    {"name": "Themes", "message": "select a theme", "preset": []}
+    {"name": "Types", "message": "select a type", "preset": ["anime", "manga"], "selected": ""},
+    {"name": "Media", "message": "select a media", "preset": [], "selected": ""},
+    {"name": "Genres", "message": "select a genre", "preset": [], "selected": ""},
+    {"name": "Themes", "message": "select a theme", "preset": [], "selected": ""}
   ]
 };
 
@@ -37,9 +37,25 @@ module.exports = {
   },
 
   getFilteredData(filters, callback) {
-    d3.json("../../data/json/anime.json", function(data) {
+    var url = BASE;
+    filters.forEach(function(filter) {
+      var selected = filter["selected"];
+      if (selected && selected.length > 0 && selected !== "default") {
+        url += "/" + filter["selected"];
+      }
+    });
+    url += "/anime.json";
+
+    console.log(url);
+    d3.json(url, function(data) {
+      console.log(data);
       callback && callback(data);
     });
+
+    // d3.json("data/json/anime.json", function(data) {
+    //   console.log(data);
+    //   callback && callback(data);
+    // });
   },
 
   getRankedAnimes(callback) {
