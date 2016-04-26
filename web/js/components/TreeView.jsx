@@ -3,8 +3,8 @@ var React = require("react");
 
 var TreeView = React.createClass({
   componentDidMount() {
-    var m = {t:25,b:25,l:0,r:25};
-    this.w = 800 - m.l - m.r;
+    var m = {t:50,b:25,l:0,r:25};
+    this.w = 1000 - m.l - m.r;
     this.h = 800 - m.t - m.b;
 
     this.vis = d3.select("#tree")
@@ -20,8 +20,7 @@ var TreeView = React.createClass({
     .size([this.w, this.h - 160]);
 
     this.tooltip = d3.select("body").append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
+    .attr("class", "tooltip");
   },
 
   visualize() {

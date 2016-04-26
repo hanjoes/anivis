@@ -115,6 +115,7 @@ var App = React.createClass({
     return (
       <div>
       <h1>ANIVIS</h1>
+      <hr></hr>
       <form>
       <Search
       searchText={this.state.searchText}

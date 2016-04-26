@@ -13,15 +13,14 @@
 div.tooltip {
   position: absolute;
   text-align: center;
-  width: 60px;
-  height: 28px;
-  padding: 2px;
-  background: lightsteelblue;
-  border: 0px;
+  padding: 5px;
+  border: 1px;
+  border-style: solid;
+  border-color: purple;
   border-radius: 8px;
   pointer-events: none;
-    .style("left", "1000px")
-    .style("top", "30px");
+  background: #C791DB;
+  opacity: 0;
 }
 
 div#detail {
@@ -32,7 +31,7 @@ div#detail {
   border-style: solid;
   border-color: purple;
   border-radius: 8px;
-  left: 1100px;
+  left: 1300px;
   top: 120px;
 }
 
@@ -44,6 +43,10 @@ body {
 h1, h2 {
   font-family: 'Jura', sans-serif;
   color: purple;
+}
+
+h1 {
+  font-size: 50px;
 }
 
 span {
@@ -89,4 +92,10 @@ div#details {
   position: absolute;
   top: 0;
   left: 3000;
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
 }
