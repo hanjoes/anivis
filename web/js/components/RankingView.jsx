@@ -193,6 +193,8 @@ var RankingView = React.createClass({
   },
 
   visualizeRects(rectData) {
+    vis.selectAll("rect").remove();
+
     var rects = vis.selectAll("rect").data(rectData);
 
     var hp = RECT_HORIZONTAL_PADDING;
@@ -240,8 +242,6 @@ var RankingView = React.createClass({
       return "rgb(" + redScale(num) + ",0,128)";
     })
     .attr("stroke", "black")
-
-    rects.exit().transition().duration(1000).remove();
   },
 
   render() {
