@@ -1,3 +1,4 @@
+var d3timer = require('d3-timer');
 var React = require('react');
 // components
 var Search = require('./Search.jsx');
@@ -8,14 +9,20 @@ var RankingView = require('./RankingView.jsx');
 // js modules
 var Actions = require('../actions/Actions');
 
+var timer;
+
 var App = React.createClass({
   getInitialState() {
     return {
       searchText: "",
       filters: [],
       categories: {},
-      animes: []
+      animes: [],
+      treeTimer: d3timer.timer(function() {})
     }
+  },
+
+  updateTimer() {
   },
 
   maintainRankingViewState(rankingViewState) {
@@ -135,7 +142,7 @@ var App = React.createClass({
         {filters}
         </form>
 
-        <TreeView root={this.state.root}/>
+        <TreeView root={this.state.root} timer={this.state.treeTimer}/>
         <RankingView hoverHandler={this.handleMouseHover} ranks={this.state.ranks}/>
         {/*<DetailsView animes={this.state.animes}/>*/}
         </div>

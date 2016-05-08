@@ -2,6 +2,7 @@
   cursor: pointer;
   stroke: green;
   stroke-width: 1.5px;
+  fill-opacity: 0.8;
 }
 
 .link {
@@ -72,7 +73,7 @@ circle.node {
 
 line.link {
   fill: none;
-  stroke: #9ecae1;
+  stroke: #cde2ff;
   stroke-width: 1.5px;
 }
 

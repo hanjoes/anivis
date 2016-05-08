@@ -71,7 +71,7 @@ var RankingView = React.createClass({
   componentDidUpdate() {
     // clear the state when updating
     indexByDomain = {}
-    
+
     if (!this.props.ranks) {
       return;
     }

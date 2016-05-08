@@ -1,6 +1,13 @@
 var d3 = require('d3');
 var React = require("react");
 
+var COLORS = {
+  0: "#3b4d5f",
+  1: "#3061b4",
+  2: "#0066a8",
+  3: "#006e74"
+};
+
 var TreeView = React.createClass({
   componentDidMount() {
     var m = {t:50,b:25,l:0,r:25};
@@ -15,8 +22,6 @@ var TreeView = React.createClass({
 
     this.force = d3.layout.force()
     .on("tick", this.tick)
-    .charge(function(d) { return -5; })
-    .linkDistance(function(d) { return 15; })
     .size([this.w, this.h - 160]);
 
     this.tooltip = d3.select("body").append("div")
@@ -31,6 +36,24 @@ var TreeView = React.createClass({
     this.force
     .nodes(nodes)
     .links(links)
+    .linkDistance(function(d) {
+      if (d.children) {
+        return 50;
+      }
+      return 20;
+    })
+    .linkStrength(function(d){
+      if (d.children) {
+        return 0.4;
+      }
+      return 0.7;
+    })
+    .charge(function(d) {
+      if (d.children) {
+        return -500;
+      }
+      return -10;
+    })
     .start();
 
     // Update the links…
@@ -54,18 +77,21 @@ var TreeView = React.createClass({
     .style("fill", this.color);
 
     this.node.transition()
-    .attr("r", function(d) { return 4.5; });
+    .attr("r", this.nodeRadius);
 
     // Enter any new nodes.
     this.node.enter().append("svg:circle")
     .attr("class", "node")
+    .attr("id", function(d) {
+      return "id" + d.id;
+    })
     .attr("cx", function(d) {
       return d.x;
     })
     .attr("cy", function(d) {
       return d.y;
     })
-    .attr("r", function(d) { return 4.5; })
+    .attr("r", this.nodeRadius)
     .style("fill", this.color)
     .on("click", this.click)
     .on("mouseover", this.mouseover)
@@ -74,16 +100,18 @@ var TreeView = React.createClass({
 
     // Exit any old nodes.
     this.node.exit().remove();
+
+    this.setupTimer();
   },
 
   mouseover(datum) {
     this.tooltip.transition()
     .duration(200)
     .style("opacity", .9);
+
     this.tooltip.html(datum.name)
     .style("left", (d3.event.pageX) + "px")
-    .style("top", (d3.event.pageY - 28) + "px");
-
+    .style("top", (d3.event.pageY) + "px");
   },
 
   mouseout(datum) {
@@ -95,48 +123,39 @@ var TreeView = React.createClass({
   tick() {
     this.node
     .attr("cx", function(d) {
-      if (d.isRoot) {
-        return 10;
-      }
       return d.x;
     })
     .attr("cy", function(d) {
-      if (d.isRoot) {
-        return 10;
-      }
       return d.y;
     });
 
     this.link
     .attr("x1", function(d) {
-      if (d.source.isRoot) {
-        return 10;
-      }
       return d.source.x;
     })
     .attr("y1", function(d) {
-      if (d.source.isRoot) {
-        return 10;
-      }
       return d.source.y;
     })
     .attr("x2", function(d) {
-      if (d.target.isRoot) {
-        return 10;
-      }
       return d.target.x;
     })
     .attr("y2", function(d) {
-      if (d.target.isRoot) {
-        return 10;
-      }
       return d.target.y;
     });
   },
 
+  // Calculate the radius of a node.
+  nodeRadius(n) {
+    if (n._children && n._children.length > 23) {
+      return Math.log2(n._children.length);
+    }
+    return 4.5;
+  },
+
   // Color leaf nodes orange, and packages white or blue.
   color(d) {
-    return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
+    var color = COLORS[d.level];
+    return d._children ? "#3182bd" : d.children ? color : "#fd8d3c";
   },
 
   // Toggle children on click.
@@ -153,29 +172,51 @@ var TreeView = React.createClass({
 
   // Returns a list of all nodes under the root.
   flatten(root) {
-    var nodes = [], i = 0;
+    root.level = 0
+
+    var nodes = [], i = 0, parent;
 
     function recurse(node) {
-      if (node.children) node.children.forEach(recurse);
+      if (parent) {
+        node.level = parent.level + 1;
+      }
+      if (node.children) {
+        var tmp = parent;
+        parent = node;
+        node.children.forEach(recurse);
+        parent = tmp;
+      }
       if (!node.id) node.id = ++i;
       node.isRoot = false;
+      node.parent = parent;
       nodes.push(node);
     }
     recurse(root);
 
     // mark the root node, after recursion, the root
     // should be the last in the list
-    if (nodes.length > 1) {
-      nodes[nodes.length - 1].isRoot = true
+    if (nodes.length >= 1) {
+      this.root = root;
+      this.root.isRoot = true
     }
 
     return nodes;
   },
 
+  setupTimer() {
+    var _c = this;
+    this.props.timer.restart(function(elapsed) {
+      var rate = Math.sin(elapsed / 500);
+      var radius = 7 * rate + 12;
+      d3.select("#id" + _c.root.id).transition()
+      .attr("r", radius)
+      .attr("fill-opacity", rate);
+    });
+  },
+
   componentDidUpdate() {
     if (this.props.root) {
       this.root = this.props.root;
-      this.root.fixed = true;
       this.root.x = this.w / 2;
       this.root.y = this.h / 2 - 80;
       this.visualize();
