@@ -12,8 +12,8 @@ var App = React.createClass({
   getInitialState() {
     return {
       searchText: "",
-      filters: [],// contains all filters, each filter will be assigned one.
-      categories: {},// contains all categories for each filter, each fillter will get one
+      filters: [],
+      categories: {},
       animes: []
     }
   },
@@ -71,10 +71,18 @@ var App = React.createClass({
         });
       });
     }
-    // updating data
+
+    ////////////////////// updating force-layout using filters
     Actions.getFilteredData(_c.selectedFilters, function(data) {
       _c.setState({
         root: data,
+      });
+    });
+
+    ////////////////////// updating rankings using filters
+    Actions.getRankedAnimes(_c.selectedFilters, function(data) {
+      _c.setState({
+        ranks: data,
       });
     });
   },
@@ -97,20 +105,8 @@ var App = React.createClass({
       _c.setState({
         filters: filters
       });
-    });
 
-    ////////////////////// initialize data
-    Actions.getFilteredData([], function(data) {
-      _c.setState({
-        root: data,
-      });
-    });
-
-    ////////////////////// initialize rankings
-    Actions.getRankedAnimes(function(data) {
-      _c.setState({
-        ranks: data,
-      });
+      _c.handleFilterAction(filters[0], filters[0]["selected"]);
     });
   },
 
@@ -133,18 +129,18 @@ var App = React.createClass({
       <hr></hr>
       <form>
       {/*<Search
-      searchText={this.state.searchText}
-      inputHandler={this.handleUserInput}
-      />*/}
-      {filters}
-      </form>
+        searchText={this.state.searchText}
+        inputHandler={this.handleUserInput}
+        />*/}
+        {filters}
+        </form>
 
-      <TreeView root={this.state.root}/>
-      <RankingView hoverHandler={this.handleMouseHover} ranks={this.state.ranks}/>
-      {/*<DetailsView animes={this.state.animes}/>*/}
-      </div>
-    );
-  }
-});
+        <TreeView root={this.state.root}/>
+        <RankingView hoverHandler={this.handleMouseHover} ranks={this.state.ranks}/>
+        {/*<DetailsView animes={this.state.animes}/>*/}
+        </div>
+      );
+    }
+  });
 
-module.exports = App;
+  module.exports = App;

@@ -32,7 +32,6 @@ var Filter = React.createClass({
     });
 
     // initialize other options from data
-    // TODO:
     categories && categories.forEach(function(category) {
       options.push(_c.getOneOption(filter, category));
     });
@@ -40,7 +39,7 @@ var Filter = React.createClass({
     return (
       <span>
       {filter["name"]}:
-      <select onChange={this.handleChange} ref={(c) => this._select = c}>
+      <select onChange={this.handleChange} ref={(c) => this._select = c} value={filter["selected"]}>
       {options}
       </select>
       </span>

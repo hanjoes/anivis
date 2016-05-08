@@ -69,6 +69,9 @@ var RankingView = React.createClass({
   },
 
   componentDidUpdate() {
+    // clear the state when updating
+    indexByDomain = {}
+    
     if (!this.props.ranks) {
       return;
     }
@@ -225,9 +228,7 @@ var RankingView = React.createClass({
       tooltip.html(detailList);
     });
 
-    rects.exit().transition().duration(1000).remove();
-
-    rects.attr("fill", "purple");
+    rects.transition().duration(1000).attr("fill", "purple");
 
     rects.transition().duration(1000)
     .attr("x", function(d) { return d.x + hp; })
@@ -239,6 +240,8 @@ var RankingView = React.createClass({
       return "rgb(" + redScale(num) + ",0,128)";
     })
     .attr("stroke", "black")
+
+    rects.exit().transition().duration(1000).remove();
   },
 
   render() {
