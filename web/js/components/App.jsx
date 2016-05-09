@@ -58,7 +58,6 @@ var App = React.createClass({
           input.push(anime);
         }
       });
-      console.log(input.length);
       _c.setState({
         animes: input
       });
@@ -170,4 +169,4 @@ var App = React.createClass({
     }
   });
 
-  module.exports = App;
+module.exports = App;

@@ -14,7 +14,7 @@ var TreeView = React.createClass({
   componentDidMount() {
     var m = {t:50,b:25,l:0,r:25};
     this.w = 1000 - m.l - m.r;
-    this.h = 800 - m.t - m.b;
+    this.h = 1000 - m.t - m.b;
 
     this.vis = d3.select("#tree")
     .attr("width", this.w + m.l + m.r)
