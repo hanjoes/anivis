@@ -4,7 +4,8 @@ var d3 = require('d3');
 var React = require('react');
 var Utils = require('../utils/Utils');
 
-var vis, w, h, yScale, yAxis, yAxisGroup, indexByDomain, tooltip, redScale, grayScale;
+var vis, w, h, yScale, yAxis, yAxisGroup, indexByDomain, redScale, grayScale;
+var previousRanks;
 
 var RECT_HORIZONTAL_PADDING = 15;
 var RED_DOMAIN_HI = 45;
@@ -46,9 +47,9 @@ var RankingView = React.createClass({
     .attr("y2", yScale);
 
     yAxisGroup.call(yAxis);
-    tooltip = d3.select("body").append("div" )
-    .attr("id", "detail")
-    .style("opacity", 0);
+    // tooltip = d3.select("body").append("div" )
+    // .attr("id", "detail")
+    // .style("opacity", 0);
 
     var log = d3.scale.linear()
     .domain([0, 45])
@@ -71,22 +72,26 @@ var RankingView = React.createClass({
   componentDidUpdate() {
     // clear the state when updating
     indexByDomain = {}
+    previousRanks = this.props.ranks;
 
     if (!this.props.ranks) {
       return;
     }
     var ratings = this.props.ranks["ratings"];
-    var lo = 0;
-    var hi = ratings.length - 1;
-    var minmax = this.minmaxWithinIndices(ratings, lo, hi);
-    if (minmax && minmax.length == 2) {
-      var minRating = minmax[0];
-      var maxRating = minmax[1];
+    if (ratings) {
+      var lo = 0;
+      var hi = ratings.length - 1;
+      var minmax = this.minmaxWithinIndices(ratings, lo, hi);
+      if (minmax && minmax.length == 2) {
+        var minRating = minmax[0];
+        var maxRating = minmax[1];
 
-      // initialize indexByDomain
-      this.insertIndexByRange(minmax, lo, hi);
+        // initialize indexByDomain
+        this.insertIndexByRange(minmax, lo, hi);
 
-      this.visualize();
+        this.visualize();
+      }
+
     }
   },
 
@@ -145,12 +150,20 @@ var RankingView = React.createClass({
   },
 
   getAnimeList(ratings, lo, hi) {
-    var items = "";
+    var list = []
     for (var i = lo; i <= hi; ++i) {
-      ratings[i];
-      items += this.getAnimeListItem(ratings[i]);
+      var rating = ratings[i];
+      list.push(rating["anime"]["name"]);
     }
-    return "<ul>" + items + "</ul>"
+
+    return list;
+  },
+
+  shouldComponentUpdate() {
+    if (!Utils.isEmpty(previousRanks) && previousRanks == this.props.ranks) {
+      return false;
+    }
+    return true;
   },
 
   findDivideIndex(ratings, lo, hi) {
@@ -185,14 +198,8 @@ var RankingView = React.createClass({
     return result
   },
 
-  getAnimeListItem(ratingItem) {
-    var rating = ratingItem["ratings"];
-    var gray = grayScale(Math.floor(rating));
-    var color = "rgb(" + gray + "," + gray + "," + gray + ");";
-    return "</br><li>" + ratingItem["anime"]["name"] + ":<span class=\"rating\" style=\"color: " + color + "\">" + ratingItem["ratings"] + "</span></li>"
-  },
-
   visualizeRects(rectData) {
+    var _c = this;
     vis.selectAll("rect").remove();
 
     var rects = vis.selectAll("rect").data(rectData);
@@ -225,9 +232,10 @@ var RankingView = React.createClass({
     .on("mouseover", function(d) {
       var key = d.lo + "_" + d.hi;
       var indices = indexByDomain[key];
-      tooltip.transition().duration(200).style("opacity", .9);
-      var detailList = component.getAnimeList(ratings, indices[0], indices[1]);
-      tooltip.html(detailList);
+      // tooltip.transition().duration(200).style("opacity", .9);
+      var animeList = component.getAnimeList(ratings, indices[0], indices[1]);
+      // tooltip.html(detailList);
+      _c.props.hoverHandler(animeList);
     });
 
     rects.transition().duration(1000).attr("fill", "purple");

@@ -21,5 +21,14 @@ module.exports = {
 
   distance(n1, n2) {
     return Math.sqrt((n1.x - n2.x) * (n1.x - n2.x), (n1.y - n2.y) * (n1.y - n2.y));
+  },
+
+  isEmpty(obj) {
+    for(var prop in obj) {
+        if(obj.hasOwnProperty(prop))
+            return false;
+    }
+
+    return true && JSON.stringify(obj) === JSON.stringify({});
   }
 };

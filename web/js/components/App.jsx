@@ -9,39 +9,59 @@ var RankingView = require('./RankingView.jsx');
 // js modules
 var Actions = require('../actions/Actions');
 
-var timer;
-
 var App = React.createClass({
   getInitialState() {
+    var _c = this;
+    _c.searchText = "";
+    _c.filters = [];
+    _c.categories = {};
+    _c.animes = [];
+    _c.treeTimer = d3timer.timer(function() {});
+    _c.root = {};
+    _c.ranks = {};
+    return _c.states();
+  },
+
+  states() {
+    var _c = this;
     return {
-      searchText: "",
-      filters: [],
-      categories: {},
-      animes: [],
-      treeTimer: d3timer.timer(function() {})
-    }
-  },
-
-  updateTimer() {
-  },
-
-  maintainRankingViewState(rankingViewState) {
-    this.rankingViewState = rankingViewState;
+      searchText: _c.searchText,
+      filters: _c.filters,
+      categories: _c.categories,
+      animes: _c.animes,
+      treeTimer: _c.treeTimer,
+      root: _c.root,
+      ranks: _c.ranks
+    };
   },
 
   getRankingViewState() {
-    return this.rankingViewState ? this.rankingViewState : {};
+    var _c = this;
+    return _c.rankingViewState ? _c.rankingViewState : {};
   },
 
   handleUserInput(searchText, attributes) {
-    this.setState({
-      searchText: searchText,
+    var _c = this;
+    _c.setState({
+      searchText: searchText
     });
   },
 
   handleMouseHover(animeList) {
-    this.setState({
-      animes: animeList
+    var _c = this;
+    Actions.getAnimeDetails(animeList, function(data) {
+      var input = [];
+      animeList.forEach(function(name) {
+        if (data[name]) {
+          var anime = data[name];
+          anime["name"] = name;
+          input.push(anime);
+        }
+      });
+      console.log(input.length);
+      _c.setState({
+        animes: input
+      });
     });
   },
 
@@ -82,14 +102,14 @@ var App = React.createClass({
     ////////////////////// updating force-layout using filters
     Actions.getFilteredData(_c.selectedFilters, function(data) {
       _c.setState({
-        root: data,
+        root: data
       });
     });
 
     ////////////////////// updating rankings using filters
     Actions.getRankedAnimes(_c.selectedFilters, function(data) {
       _c.setState({
-        ranks: data,
+        ranks: data
       });
     });
   },
@@ -118,9 +138,9 @@ var App = React.createClass({
   },
 
   render() {
-    var filters = [];
     var _c = this;
-    this.state.filters.forEach(function(filter) {
+    var filters = [];
+    _c.state.filters.forEach(function(filter) {
       filters.push(<Filter
         filter={filter}
         categories={_c.categories[filter["name"]]}
@@ -144,7 +164,7 @@ var App = React.createClass({
 
         <TreeView root={this.state.root} timer={this.state.treeTimer}/>
         <RankingView hoverHandler={this.handleMouseHover} ranks={this.state.ranks}/>
-        {/*<DetailsView animes={this.state.animes}/>*/}
+        <DetailsView animes={this.state.animes}/>
         </div>
       );
     }

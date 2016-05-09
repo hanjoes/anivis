@@ -60,6 +60,12 @@ module.exports = {
     });
     url += suffix;
     return url;
+  },
+
+  getAnimeDetails(names, callback) {
+    d3.json(BASE + "/info.json", function(data) {
+      callback && callback(data);
+    });
   }
 
 };

@@ -8,6 +8,8 @@ var COLORS = {
   3: "#006e74"
 };
 
+var previousRoot;
+
 var TreeView = React.createClass({
   componentDidMount() {
     var m = {t:50,b:25,l:0,r:25};
@@ -38,19 +40,16 @@ var TreeView = React.createClass({
     .links(links)
     .linkDistance(function(d) {
       if (d.children) {
-        return 50;
+        return 30;
       }
       return 20;
     })
     .linkStrength(function(d){
-      if (d.children) {
-        return 0.4;
-      }
       return 0.7;
     })
     .charge(function(d) {
       if (d.children) {
-        return -500;
+        return -300;
       }
       return -10;
     })
@@ -147,7 +146,7 @@ var TreeView = React.createClass({
   // Calculate the radius of a node.
   nodeRadius(n) {
     if (n._children && n._children.length > 23) {
-      return Math.log2(n._children.length);
+      return Math.log2(n._children.length * 100);
     }
     return 4.5;
   },
@@ -203,22 +202,29 @@ var TreeView = React.createClass({
     return nodes;
   },
 
+  shouldComponentUpdate() {
+    if (previousRoot == this.props.root) {
+      return false;
+    }
+    return true;
+  },
+
   setupTimer() {
     var _c = this;
     this.props.timer.restart(function(elapsed) {
       var rate = Math.sin(elapsed / 500);
       var radius = 7 * rate + 12;
       d3.select("#id" + _c.root.id).transition()
-      .attr("r", radius)
-      .attr("fill-opacity", rate);
+      .attr("r", radius);
     });
   },
 
   componentDidUpdate() {
     if (this.props.root) {
+      previousRoot = this.root;
       this.root = this.props.root;
       this.root.x = this.w / 2;
-      this.root.y = this.h / 2 - 80;
+      this.root.y = this.h / 2;
       this.visualize();
     }
   },
