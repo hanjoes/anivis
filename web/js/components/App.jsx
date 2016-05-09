@@ -98,6 +98,12 @@ var App = React.createClass({
       });
     }
 
+    ////////////////////// validate filters
+    if (!Actions.filterIsValid(_c.selectedFilters)) {
+      alert("Invalid filter combination!");
+      return;
+    }
+
     ////////////////////// updating force-layout using filters
     Actions.getFilteredData(_c.selectedFilters, function(data) {
       _c.setState({

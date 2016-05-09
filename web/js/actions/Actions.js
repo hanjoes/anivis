@@ -36,6 +36,14 @@ module.exports = {
     });
   },
 
+  filterIsValid(filters) {
+    var url = this.getUrlFromFilters(filters, "/anime.json");
+    var http = new XMLHttpRequest();
+    http.open('HEAD', url, false);
+    http.send();
+    return http.status!=404;
+  },
+
   getFilteredData(filters, callback) {
     var url = this.getUrlFromFilters(filters, "/anime.json");
     d3.json(url, function(data) {
