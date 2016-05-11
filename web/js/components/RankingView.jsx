@@ -12,7 +12,7 @@ var RED_DOMAIN_HI = 45;
 var RankingView = React.createClass({
 
   componentDidMount() {
-    var m = {t:50,b:25,l:25,r:25};
+    var m = {t:150,b:25,l:25,r:25};
     w = 260 - m.l - m.r;
     h = 800 - m.t - m.b;
 
@@ -56,7 +56,7 @@ var RankingView = React.createClass({
 
     d3.select("#ranking").append("g")
     .attr("class", "legendLog")
-    .attr("transform", "translate(50,0)");
+    .attr("transform", "translate(50, 950)");
 
     var logLegend = d3.legend.color()
     .orient('horizontal')

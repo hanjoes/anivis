@@ -15,6 +15,20 @@ span.rating {
   padding-left: 10px;
 }
 
+div#detail {
+  position: absolute;
+  text-align: left;
+  padding: 10px;
+  border-style: solid;
+  border-color: purple;
+  border-radius: 8px;
+  left: 1350px;
+  top: 158px;
+  height: 983px;
+  width: 347px;
+  overflow-y: scroll;
+}
+
 div.tooltip {
   position: absolute;
   text-align: center;
@@ -28,18 +42,19 @@ div.tooltip {
   opacity: 0;
 }
 
-div#detail {
-  position: absolute;
-  text-align: left;
-  padding: 10px;
-  border: 1px;
+svg#tree {
   border-style: solid;
   border-color: purple;
   border-radius: 8px;
-  left: 1300px;
-  top: 120px;
+  margin-top: 15px;
+}
+svg#ranking {
+  border-style: solid;
+  border-color: purple;
+  border-radius: 8px;
+  margin-top: 15px;
+  margin-left: 25px;
   height: 1000px;
-  overflow-y: scroll;
 }
 
 body {
@@ -109,4 +124,13 @@ hr {
 
 div.text {
   width: 200px;
+}
+
+select.filters {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+span {
+  padding-left: 10px;
 }

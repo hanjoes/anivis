@@ -181,6 +181,10 @@ var App = React.createClass({
       );
     });
 
+    var color = {
+      color: "#cccccc"
+    };
+
     return (
       <div>
       <h1>ANIVIS</h1>
@@ -196,6 +200,9 @@ var App = React.createClass({
       <TreeView root={this.state.root} timer={this.state.treeTimer}/>
       <RankingView hoverHandler={this.handleMouseHover} ranks={this.state.ranks}/>
       <DetailsView animes={this.state.animes}/>
+      <hr></hr>
+      <h3><span>Hanzhou Shi,</span><span>Juan Yescas,</span><span>Kannan Chinnasamy</span></h3>
+      <h4 style={color}><span>USFCA</span><span>CS686</span><span>Final Project</span></h4>
       </div>
     );
   }

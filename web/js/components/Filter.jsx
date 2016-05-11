@@ -39,7 +39,7 @@ var Filter = React.createClass({
     return (
       <span>
       {filter["name"]}:
-      <select onChange={this.handleChange} ref={(c) => this._select = c} value={filter["selected"]}>
+      <select class="filters" onChange={this.handleChange} ref={(c) => this._select = c} value={filter["selected"]}>
       {options}
       </select>
       </span>
