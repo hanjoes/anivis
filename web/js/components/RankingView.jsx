@@ -5,7 +5,6 @@ var React = require('react');
 var Utils = require('../utils/Utils');
 
 var vis, w, h, yScale, yAxis, yAxisGroup, indexByDomain, redScale, grayScale;
-var previousRanks;
 
 var RECT_HORIZONTAL_PADDING = 15;
 var RED_DOMAIN_HI = 45;
@@ -72,7 +71,6 @@ var RankingView = React.createClass({
   componentDidUpdate() {
     // clear the state when updating
     indexByDomain = {}
-    previousRanks = this.props.ranks;
 
     if (!this.props.ranks) {
       return;
@@ -88,7 +86,6 @@ var RankingView = React.createClass({
 
         // initialize indexByDomain
         this.insertIndexByRange(minmax, lo, hi);
-
         this.visualize();
       }
 
@@ -159,8 +156,8 @@ var RankingView = React.createClass({
     return list;
   },
 
-  shouldComponentUpdate() {
-    if (!Utils.isEmpty(previousRanks) && previousRanks == this.props.ranks) {
+  shouldComponentUpdate(nextProps) {
+    if (this.props.ranks == nextProps.ranks) {
       return false;
     }
     return true;

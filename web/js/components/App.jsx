@@ -69,7 +69,6 @@ var App = React.createClass({
         root: forceTree
       });
     });
-
   },
 
   handleMouseHover(animeList) {
@@ -131,14 +130,15 @@ var App = React.createClass({
 
     ////////////////////// updating force-layout using filters
     Actions.getFilteredData(_c.selectedFilters, function(data) {
-      _c.root = data;
       _c.setState({
-        root: _c.root
+        root: data
       });
+
     });
 
     ////////////////////// updating rankings using filters
     Actions.getRankedAnimes(_c.selectedFilters, function(data) {
+      console.log(data);
       _c.setState({
         ranks: data
       });

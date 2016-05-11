@@ -225,13 +225,6 @@ var TreeView = React.createClass({
     return nodes;
   },
 
-  shouldComponentUpdate() {
-    if (previousRoot == this.props.root) {
-      return false;
-    }
-    return true;
-  },
-
   setupTimer() {
     var _c = this;
     this.props.timer.restart(function(elapsed) {
