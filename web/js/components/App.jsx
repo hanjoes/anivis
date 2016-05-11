@@ -47,8 +47,8 @@ var App = React.createClass({
     if (searchText.trim().length < 2) {
       _c.setState({
         searchText: searchText,
-        root: _c.root
       });
+      _c.onFilterUpdate(_c.selectedFilters);
       return;
     }
 
@@ -122,6 +122,11 @@ var App = React.createClass({
       });
     }
 
+    _c.onFilterUpdate(_c.selectedFilters);
+  },
+
+  onFilterUpdate(newFilters) {
+    var _c = this;
     ////////////////////// validate filters
     if (!Actions.filterIsValid(_c.selectedFilters)) {
       alert("Invalid filter combination!");
