@@ -8,6 +8,13 @@ var COLORS = {
   3: "#006e74"
 };
 
+var LINE_COLORS = {
+  0: "#cde2ff",
+  1: "#cde2ff",
+  2: "#a6cbff",
+  3: "#4492ff"
+}
+
 var previousRoot;
 
 var TreeView = React.createClass({
@@ -66,6 +73,17 @@ var TreeView = React.createClass({
     .attr("y1", function(d) { return d.source.y; })
     .attr("x2", function(d) { return d.target.x; })
     .attr("y2", function(d) { return d.target.y; });
+
+    this.link.style("stroke", function(d) {
+      var similarity = 0;
+      if (d.source["similarity"]) {
+        similarity = d.source["similarity"];
+      }
+      else if (d.target["similarity"]) {
+        similarity = d.target["similarity"];
+      }
+      return LINE_COLORS[similarity];
+    });
 
     // Exit any old links.
     this.link.exit().remove();
@@ -159,7 +177,6 @@ var TreeView = React.createClass({
     }
     else {
       return d._children ? "#3182bd" : d.children ? color : "#fd8d3c";
-
     }
   },
 
