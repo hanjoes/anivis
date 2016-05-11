@@ -56,7 +56,7 @@ var App = React.createClass({
       var matchingAnimes = [];
       for (var key in data) {
         if (data.hasOwnProperty(key)) {
-          if (key.indexOf(searchText) > -1) {
+          if (key.toLowerCase().indexOf(searchText.toLowerCase()) > -1) {
             var anime = data[key];
             anime["name"] = key;
             matchingAnimes.push(anime);
