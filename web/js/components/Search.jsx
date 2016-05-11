@@ -2,6 +2,7 @@ var React = require('react');
 
 var Search = React.createClass({
   handleChange() {
+    var _c = this;
     this.props.inputHandler(this.textInput.value, []);
   },
 

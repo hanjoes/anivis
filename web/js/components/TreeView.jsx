@@ -154,7 +154,13 @@ var TreeView = React.createClass({
   // Color leaf nodes orange, and packages white or blue.
   color(d) {
     var color = COLORS[d.level];
-    return d._children ? "#3182bd" : d.children ? color : "#fd8d3c";
+    if (d["noSimilar"] && d["noSimilar"] == 1) {
+      return "#949494";
+    }
+    else {
+      return d._children ? "#3182bd" : d.children ? color : "#fd8d3c";
+
+    }
   },
 
   // Toggle children on click.

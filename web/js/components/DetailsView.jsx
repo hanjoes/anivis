@@ -19,7 +19,8 @@ var DetailsView = React.createClass({
 
   getSimilars(anime) {
     var str = "";
-    anime["similar"].forEach(function(name) {
+    anime["similar"].forEach(function(similarAnime) {
+      var name = similarAnime["name"];
       if (str.length < MAX_STR_LEN) {
         if (str.length == 0) {
           str += name;

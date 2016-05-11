@@ -51,6 +51,12 @@ module.exports = {
     });
   },
 
+  getMatchingAnimes(searchStr, callback) {
+    d3.json(BASE + "/info.json", function(data) {
+      callback && callback(data);
+    });
+  },
+
   getRankedAnimes(filters, callback) {
     var url = this.getUrlFromFilters(filters, "/rating.json");
     d3.json(url, function(data) {

@@ -7,6 +7,7 @@ var TreeView = require('./TreeView.jsx');
 var DetailsView = require('./DetailsView.jsx');
 var RankingView = require('./RankingView.jsx');
 // js modules
+var Utils = require('../utils/Utils');
 var Actions = require('../actions/Actions');
 
 var App = React.createClass({
@@ -42,9 +43,33 @@ var App = React.createClass({
 
   handleUserInput(searchText, attributes) {
     var _c = this;
-    _c.setState({
-      searchText: searchText
+
+    if (searchText.trim().length < 2) {
+      _c.setState({
+        searchText: searchText,
+        root: _c.root
+      });
+      return;
+    }
+
+    Actions.getMatchingAnimes(searchText, function(data) {
+      var matchingAnimes = [];
+      for (var key in data) {
+        if (data.hasOwnProperty(key)) {
+          if (key.indexOf(searchText) > -1) {
+            var anime = data[key];
+            anime["name"] = key;
+            matchingAnimes.push(anime);
+          }
+        }
+      }
+      var forceTree = Utils.buildForceTree(matchingAnimes);
+      _c.setState({
+        searchText: searchText,
+        root: forceTree
+      });
     });
+
   },
 
   handleMouseHover(animeList) {
@@ -106,8 +131,9 @@ var App = React.createClass({
 
     ////////////////////// updating force-layout using filters
     Actions.getFilteredData(_c.selectedFilters, function(data) {
+      _c.root = data;
       _c.setState({
-        root: data
+        root: _c.root
       });
     });
 
@@ -160,19 +186,19 @@ var App = React.createClass({
       <h1>ANIVIS</h1>
       <hr></hr>
       <form>
-      {/*<Search
-        searchText={this.state.searchText}
-        inputHandler={this.handleUserInput}
-        />*/}
-        {filters}
-        </form>
+      <Search
+      searchText={this.state.searchText}
+      inputHandler={this.handleUserInput}
+      />
+      {filters}
+      </form>
 
-        <TreeView root={this.state.root} timer={this.state.treeTimer}/>
-        <RankingView hoverHandler={this.handleMouseHover} ranks={this.state.ranks}/>
-        <DetailsView animes={this.state.animes}/>
-        </div>
-      );
-    }
-  });
+      <TreeView root={this.state.root} timer={this.state.treeTimer}/>
+      <RankingView hoverHandler={this.handleMouseHover} ranks={this.state.ranks}/>
+      <DetailsView animes={this.state.animes}/>
+      </div>
+    );
+  }
+});
 
 module.exports = App;
