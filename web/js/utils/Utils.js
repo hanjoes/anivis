@@ -49,14 +49,16 @@ module.exports = {
       var animeItem = {
         "name": anime["name"],
         "children": [],
-        "level": 1
+        "level": 1,
+        "isAnime": 1
       };
       // Similar animes (3rd level)
       anime["similar"].forEach(function(similarAnime) {
         var similarItem = {
           "name": similarAnime["name"],
           "level": 2,
-          "similarity": similarAnime["similar"]
+          "similarity": similarAnime["similar"],
+          "isAnime": 1
         };
         animeItem["children"].push(similarItem);
       });

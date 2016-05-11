@@ -46,9 +46,6 @@ var RankingView = React.createClass({
     .attr("y2", yScale);
 
     yAxisGroup.call(yAxis);
-    // tooltip = d3.select("body").append("div" )
-    // .attr("id", "detail")
-    // .style("opacity", 0);
 
     var log = d3.scale.linear()
     .domain([0, 45])

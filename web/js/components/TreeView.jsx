@@ -182,14 +182,21 @@ var TreeView = React.createClass({
 
   // Toggle children on click.
   click(d) {
-    if (d.children) {
-      d._children = d.children;
-      d.children = null;
-    } else {
-      d.children = d._children;
-      d._children = null;
+    if (d3.event.shiftKey) {
+      if ((!d.children && !d._children) || d["isAnime"]) {
+        this.props.dataHandler([d["name"]]);
+      }
     }
-    this.visualize();
+    else {
+      if (d.children) {
+        d._children = d.children;
+        d.children = null;
+      } else {
+        d.children = d._children;
+        d._children = null;
+      }
+      this.visualize();
+    }
   },
 
   // Returns a list of all nodes under the root.

@@ -71,7 +71,7 @@ var App = React.createClass({
     });
   },
 
-  handleMouseHover(animeList) {
+  handleAnimeList(animeList) {
     var _c = this;
     Actions.getAnimeDetails(animeList, function(data) {
       var input = [];
@@ -197,8 +197,8 @@ var App = React.createClass({
       {filters}
       </form>
 
-      <TreeView root={this.state.root} timer={this.state.treeTimer}/>
-      <RankingView hoverHandler={this.handleMouseHover} ranks={this.state.ranks}/>
+      <TreeView root={this.state.root} timer={this.state.treeTimer} dataHandler={this.handleAnimeList}/>
+      <RankingView hoverHandler={this.handleAnimeList} ranks={this.state.ranks}/>
       <DetailsView animes={this.state.animes}/>
       <hr></hr>
       <h3><span>Hanzhou Shi,</span><span>Juan Yescas,</span><span>Kannan Chinnasamy</span></h3>
