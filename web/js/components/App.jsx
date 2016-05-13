@@ -143,7 +143,6 @@ var App = React.createClass({
 
     ////////////////////// updating rankings using filters
     Actions.getRankedAnimes(_c.selectedFilters, function(data) {
-      console.log(data);
       _c.setState({
         ranks: data
       });

@@ -4,10 +4,17 @@ var d3 = require('d3');
 var React = require('react');
 var Utils = require('../utils/Utils');
 
-var vis, w, h, yScale, yAxis, yAxisGroup, indexByDomain, redScale, grayScale;
+var vis, w, h, yScale, yAxis, yAxisGroup, indexByDomain, redScale, grayScale, legendScale;
 
 var RECT_HORIZONTAL_PADDING = 15;
 var RED_DOMAIN_HI = 45;
+
+var BREWED_COLOR = {
+  0: "237,248,251",
+  1: "179,205,227",
+  2: "140,150,198",
+  3: "136,65,157"
+};
 
 var RankingView = React.createClass({
 
@@ -24,8 +31,11 @@ var RankingView = React.createClass({
 
     indexByDomain = {};
     yScale = d3.scale.linear().range([h, 0]).domain([0, 10]);
-    redScale = d3.scale.linear().range([0, 150]).domain([0, RED_DOMAIN_HI]);
+    redScale = d3.scale.linear().range([0, 3]).domain([0, RED_DOMAIN_HI]);
     grayScale = d3.scale.linear().range([200, 0]).domain([0, 10]);
+    legendScale = d3.scale.ordinal()
+    .domain(["0", "15", "30", "45"])
+    .range(["rgb("+ BREWED_COLOR[0] +")", "rgb("+ BREWED_COLOR[1] +")", "rgb("+ BREWED_COLOR[2] +")", "rgb("+ BREWED_COLOR[3] +")"]);
 
     yAxis = d3.svg.axis()
     .scale(yScale)
@@ -47,10 +57,6 @@ var RankingView = React.createClass({
 
     yAxisGroup.call(yAxis);
 
-    var log = d3.scale.linear()
-    .domain([0, 45])
-    .range(["rgb(0, 0, 128)", "rgb(150, 0, 128)"]);
-
     d3.select("#ranking").append("g")
     .attr("class", "legendLog")
     .attr("transform", "translate(50, 950)");
@@ -58,8 +64,7 @@ var RankingView = React.createClass({
     var logLegend = d3.legend.color()
     .orient('horizontal')
     .shapeWidth(30)
-    .cells([0, 15, 30, 45])
-    .scale(log);
+    .scale(legendScale);
 
     d3.select(".legendLog")
     .call(logLegend);
@@ -241,7 +246,7 @@ var RankingView = React.createClass({
     .attr("height", function(d) { return d.h; })
     .attr("fill", function(d) {
       var num = Math.min(RED_DOMAIN_HI, d.n)
-      return "rgb(" + redScale(num) + ",0,128)";
+      return "rgb(" + BREWED_COLOR[Math.round(redScale(num))] + ")";
     })
     .attr("stroke", "black")
   },
