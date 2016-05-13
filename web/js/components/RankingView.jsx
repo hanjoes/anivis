@@ -210,6 +210,7 @@ var RankingView = React.createClass({
     rects.enter()
     .append("rect")
     .attr("class", "rankingRect")
+    .attr("fill-opacity", 0)
     .on("click", function(d) {
       var key = d.lo + "_" + d.hi;
       var indices = indexByDomain[key];
@@ -244,6 +245,7 @@ var RankingView = React.createClass({
     .attr("y", function(d) { return d.y; })
     .attr("width", function(d) { return d.w - 5 * hp; })
     .attr("height", function(d) { return d.h; })
+    .attr("fill-opacity", 1)
     .attr("fill", function(d) {
       var num = Math.min(RED_DOMAIN_HI, d.n)
       return "rgb(" + BREWED_COLOR[Math.round(redScale(num))] + ")";
