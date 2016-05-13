@@ -46,8 +46,10 @@ var TreeView = React.createClass({
     .nodes(nodes)
     .links(links)
     .linkDistance(function(d) {
-      if (d.children) {
-        return 30;
+      var similarity = 0;
+      if (d.source["similarity"] || d.target["similarity"]) {
+        similarity = d.source["similarity"] ? d.source["similarity"] : d.target["similarity"];
+        return (3 - similarity) * 40;
       }
       return 20;
     })
