@@ -1,5 +1,7 @@
 # Anivis
 
+![Screenshot](screenshot.png)
+
 ## Link
 
 Click [here](http://hanjoes.github.io/anivis/) to start exploring animes.
