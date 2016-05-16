@@ -1,4 +1,4 @@
-# Anivis
+# ANIVIS
 
 ![Screenshot](screenshot.png)
 
