@@ -35,9 +35,12 @@ class Transform:
 
     TAG_ATTR_NAME = "name"
     TAG_ATTR_TYPE = "type"
+    TAG_ATTR_SRC = "src"
     TAG_VALUE = "value"  # data contained with in the tag
     TAG_ATTR_TYPE_GENRES = "Genres"
     TAG_ATTR_TYPE_THEMES = "Themes"
+    TAG_ATTR_TYPE_PICTURE = "Picture"
+    TAG_ATTR_TYPE_SUMMARY = "Plot Summary"
     TAG_ATTR_WEIGHTED_SCORE = "weighted_score"
 
     MOVIES = "movies"
@@ -47,9 +50,13 @@ class Transform:
 
     ATTR_GENRE = TAG_ATTR_TYPE_GENRES
     ATTR_THEMES = TAG_ATTR_TYPE_THEMES
+    ATTR_PICTURE = TAG_ATTR_TYPE_PICTURE
+    ATTR_SUMMARY = TAG_ATTR_TYPE_SUMMARY
 
-    info_tag_type_values = [TAG_ATTR_TYPE_GENRES, TAG_ATTR_TYPE_THEMES]
+    info_tag_type_values = [TAG_ATTR_TYPE_GENRES, TAG_ATTR_TYPE_THEMES, TAG_ATTR_TYPE_SUMMARY]
 
+    ROOT_PATH = "web/db"
+    LIMIT = 1000
     NAME = "name"
     IS_ROOT = "isRoot"
     CHILDREN = "children"
@@ -62,9 +69,16 @@ class Transform:
     ALL_MANGA = "all_manga"
     ALL_ANIME = "all_anime"
     MANGA_TYPE = ["manga", "magazine"]
+
     SUMMARY = "summary"
     RATINGS = "ratings"
     IMAGE = "image"
+    ANIME_DETAILS_PIC = "pic"
+    ANIME_DETAILS_SIMILAR = "similar"
+    ANIME_DETAILS_LINKS = "links"
+    ANIME_DETIALS_RATING = "rating"
+
+    all_anime_details = {}
 
     def __init__(self):
         pass
@@ -80,7 +94,6 @@ class Transform:
                 if self.tag_attrib_value(anime, self.TAG_ATTR_NAME) != self.UNKNOWN:
                     anime_type, info = self.init_info(anime, anime_infos)
                     self.handle_tag(anime, info)
-                    print anime_type + " " + str(info)
                     anime_infos[anime_type].append(info)
         return anime_infos
 
@@ -123,15 +136,23 @@ class Transform:
                 continue
             type_info = self.handle_info_tag_types(info)
             if type_info:
-                anime_info[type_info[self.TAG_ATTR_TYPE]].append(type_info[self.TAG_VALUE])
+                if type_info[self.TAG_ATTR_TYPE] == self.TAG_ATTR_TYPE_SUMMARY:
+                    anime_info[type_info[self.TAG_ATTR_TYPE]] = type_info[self.TAG_VALUE]
+                else:
+                    anime_info[type_info[self.TAG_ATTR_TYPE]].append(type_info[self.TAG_VALUE])
 
     # handles "type" attrib in the <info> tag which have value in "info_type"
     def handle_info_tag_types(self, tag_node):
+
         if tag_node.attrib[self.TAG_ATTR_TYPE] in self.info_tag_type_values:
             return {self.TAG_ATTR_TYPE: tag_node.attrib[self.TAG_ATTR_TYPE], self.TAG_VALUE: tag_node.text}
+        elif tag_node.attrib[self.TAG_ATTR_TYPE] == self.TAG_ATTR_TYPE_PICTURE:
+            return {self.TAG_ATTR_TYPE: tag_node.attrib[self.TAG_ATTR_TYPE],
+                    self.TAG_VALUE: tag_node.attrib[self.TAG_ATTR_SRC]}
 
     def default_info(self, name):
-        return {self.ATTR_NAME: name, self.ATTR_GENRE: [], self.ATTR_THEMES: []}
+        return {self.ATTR_NAME: name, self.ATTR_GENRE: [], self.ATTR_THEMES: [], self.ATTR_PICTURE: [],
+                self.ATTR_SUMMARY: ""}
 
     def parse_all_files(self, xml_dir, des_folder, is_per_file):
         import os
@@ -236,7 +257,13 @@ class Transform:
 
     """
 
+    def gen_anime_details_node(self, summary, image, links, rating, similar):
+        return {self.SUMMARY: summary, self.ANIME_DETAILS_PIC: image, self.ANIME_DETIALS_RATING: rating,
+                self.ANIME_DETAILS_SIMILAR: similar}
+
     def gen_default_node(self, name, _type, _children):
+        if type(_children) is not list:
+            _children = [_children]
         return {self.NAME: name, _type: "yes", self.CHILDREN: _children}
 
     def gen_zoom_node(self, summary, image, rating):
@@ -319,37 +346,63 @@ class Transform:
             if media not in inter_data:
                 inter_data[media] = {}
                 inter_data[media][self.ALL] = {}
+
             for anime in json_data[data]:
                 genres = [self.UNKNOWN_GENRE]
                 themes = [self.UNKNOWN_THEME]
                 anime_name = anime[self.ATTR_NAME]
                 anime_rating = anime[self.TAG_RATING]
-                anime_details = self.gen_zoom_node("TBD", "TBD", anime_rating)
+                anime_image = anime[self.TAG_ATTR_TYPE_PICTURE]
+                anime_summary = anime[self.TAG_ATTR_TYPE_SUMMARY]
+                anime_links = "TBA"
+                anime_details = self.gen_zoom_node(anime_summary, anime_image, anime_rating)
+                self.all_anime_details[anime_name] = self.gen_anime_details_node(anime_summary, anime_image,
+                                                                                 anime_links, anime_rating, [])
                 if media in self.MANGA_TYPE:
-                    inter_data[self.ALL_MANGA][anime_name] = anime_details
+                    if media not in inter_data[self.ALL_MANGA]:
+                        inter_data[self.ALL_MANGA][media] = {}
+                    inter_data[self.ALL_MANGA][media][anime_name] = anime_details
                 else:
-                    inter_data[self.ALL_ANIME][anime_name] = anime_details
+                    if media not in inter_data[self.ALL_ANIME]:
+                        inter_data[self.ALL_ANIME][media] = {}
+                    inter_data[self.ALL_ANIME][media][anime_name] = anime_details
 
-                # add the anime to ALL in the media hierarchy
-                inter_data[media][self.ALL][anime_name] = anime_details
                 if len(anime[self.ATTR_GENRE]) > 0:
                     genres = anime[self.ATTR_GENRE]
                 if len(anime[self.ATTR_THEMES]) > 0:
                     themes = anime[self.ATTR_THEMES]
                 for genre in genres:
+
+                    if genre not in inter_data[media][self.ALL]:
+                        inter_data[media][self.ALL][genre] = {}
+                    # add the anime to ALL in the genre hierarchy
+                    inter_data[media][self.ALL][genre][anime_name] = anime_details
+
+                    # if media in self.MANGA_TYPE:
+                    #     if genre not in inter_data[self.ALL_MANGA]:
+                    #         inter_data[self.ALL_MANGA][genre] = {}
+                    #     inter_data[self.ALL_MANGA][genre][anime_name] = anime_details
+                    # else:
+                    #     if genre not in inter_data[self.ALL_ANIME]:
+                    #         inter_data[self.ALL_ANIME][genre] = {}
+                    #     inter_data[self.ALL_ANIME][genre][anime_name] = anime_details
+
                     if genre not in inter_data[media]:
                         inter_data[media][genre] = {}
                         inter_data[media][genre][self.ALL] = {}
-                    # add the anime to ALL in the genre hierarchy
-                    inter_data[media][genre][self.ALL][anime_name] = anime_details
                     for theme in themes:
+                        if theme not in inter_data[media][genre][self.ALL]:
+                            inter_data[media][genre][self.ALL][theme] = {}
+                        # add the anime to ALL in the genre hierarchy
+                        inter_data[media][genre][self.ALL][theme][anime_name] = anime_details
+
                         if theme not in inter_data[media][genre]:
                             inter_data[media][genre][theme] = {}
                         inter_data[media][genre][theme][anime_name] = anime_details
         self.gen_overview_forced_layout(inter_data)
 
     def gen_overview_forced_layout(self, intermediate_data_v2):
-        root = "web/db"
+        root = self.ROOT_PATH
         anime_media = {}
         manga_media = {}
         anime_all_genre = {}
@@ -361,10 +414,10 @@ class Transform:
 
             if media == self.ALL_ANIME:
                 path = root + "/" + self.ANIME
-                self.create_anime_json(intermediate_data_v2[media], path, self.ANIME)
+                self.create_anime_all_json(intermediate_data_v2[media], path, self.ANIME)
             elif media == self.ALL_MANGA:
                 path = root + "/" + self.MANGA
-                self.create_anime_json(intermediate_data_v2[media], path, self.MANGA)
+                self.create_anime_all_json(intermediate_data_v2[media], path, self.MANGA)
             else:
                 category = self.ANIME
                 if media in self.MANGA_TYPE:
@@ -381,9 +434,10 @@ class Transform:
                         manga_all_genre[genre] = {}
                     if genre == "all":
                         path = root + "/" + category + "/" + media + "/"
-                        self.create_anime_json(intermediate_data_v2[media][genre], path, category, media)
+                        self.create_anime_all_json(intermediate_data_v2[media][genre], path, category, media)
                     else:
                         for theme in intermediate_data_v2[media][genre]:
+
                             if category == self.ANIME:
                                 anime_all_theme[theme] = {}
                             else:
@@ -395,9 +449,9 @@ class Transform:
                                 "")
                             if theme == "all":
                                 path = root + "/" + category + "/" + media + "/" + genre.replace("/", "")
-                                self.create_anime_json(intermediate_data_v2[media][genre][theme], path, category,
-                                                       media,
-                                                       genre)
+                                self.create_anime_all_json(intermediate_data_v2[media][genre][theme], path, category,
+                                                           media,
+                                                           genre)
                             else:
                                 self.create_anime_json(intermediate_data_v2[media][genre][theme], path, category,
                                                        media,
@@ -414,23 +468,108 @@ class Transform:
         self.create_file(path + "/theme.json", manga_all_theme)
         self.create_file(path + "/genre.json", manga_all_genre)
 
+        self.create_file(self.ROOT_PATH + "/info.json", self.all_anime_details)
+
     def create_anime_json(self, animes, path, category, media=None, genre=None, theme=None):
         self.create_dir(path)
         des_anime_file = path + "/" + "anime.json"
         des_rating_file = path + "/" + "rating.json"
         root_json = []
         rating_data = []
+        rating_set = set()
+        animes_list = animes.keys()[:self.LIMIT]
+        print "***********************************************"
+        print len(animes_list)
+        print "***********************************************"
+        for key in animes_list:
+            inter_list = animes_list[:]
+            inter_list.remove(key)
+            rating_val = float(animes[key][self.TAG_RATING])
+            count = 0
+            maxCount = 1
+            for json_data in self.all_anime_details[key][self.ANIME_DETAILS_SIMILAR]:
+                if json_data[self.ANIME_DETAILS_SIMILAR] in inter_list:
+                    inter_list.remove(json_data[self.ANIME_DETAILS_SIMILAR])
 
-        for key in animes.keys():
+            for inter in inter_list:
+                inter_rating = float(animes[inter][self.TAG_RATING])
+                if inter_rating > 0 and rating_val > 0 and inter_rating <= rating_val:
+                    print str(inter_rating) + "  " + str(rating_val)
+                    self.all_anime_details[key][self.ANIME_DETAILS_SIMILAR].append(
+                        {self.NAME: inter, self.ANIME_DETAILS_SIMILAR: 3})
+                    count += 1
+                if count >= maxCount:
+                    break
+            if key not in rating_set:
+                rating_set.add(key)
+                rating_data.append(self.gen_leaf_rating_node(key, animes[key][self.TAG_RATING]))
             root_json.append(self.gen_leaf_anime_node(key, "isMovie"))
-            rating_data.append(self.gen_leaf_rating_node(key, animes[key][self.TAG_RATING]))
+
         if theme:
             root_json = self.gen_default_node(theme, "isTheme", root_json)
         if genre:
-            root_json = self.gen_default_node(genre, "isGenre", [root_json])
+            root_json = self.gen_default_node(genre, "isGenre", root_json)
         if media:
-            root_json = self.gen_default_node(media, "isMedia", [root_json])
-        root_json = self.gen_default_node(category, "isRoot", [root_json])
+            root_json = self.gen_default_node(media, "isMedia", root_json)
+        root_json = self.gen_default_node(category, "isRoot", root_json)
+
+        rating_data = sorted(rating_data, key=lambda k: k[self.TAG_RATING], reverse=True)
+
+        self.create_file(des_anime_file, root_json)
+        self.create_file(des_rating_file, {self.RATINGS: rating_data})
+
+    def create_anime_all_json(self, animes, path, category, media=None, genre=None):
+        self.create_dir(path)
+        des_anime_file = path + "/" + "anime.json"
+        des_rating_file = path + "/" + "rating.json"
+        root_json = []
+        rating_data = []
+        rating_set = set()
+        for parent in animes.keys():
+            parentType = "isTheme"
+            if not genre:
+                parentType = "isGenre"
+            if not media:
+                parentType = "isMedia"
+            anime_json = []
+            for key in animes[parent].keys()[:self.LIMIT]:
+                anime_json.append(self.gen_leaf_anime_node(key, "isMovie"))
+
+                inter_list = animes[parent].keys()
+                inter_list.remove(key)
+                for json_data in self.all_anime_details[key][self.ANIME_DETAILS_SIMILAR]:
+                    if json_data[self.ANIME_DETAILS_SIMILAR] in inter_list:
+                        inter_list.remove(json_data[self.ANIME_DETAILS_SIMILAR])
+                rating_val = float(animes[parent][key][self.TAG_RATING])
+                maxCount1 = 1
+                maxCount2 = 1
+                count1 = 0
+                count2 = 0
+                for inter in inter_list:
+                    inter_rating = float(animes[parent][inter][self.TAG_RATING])
+                    if inter_rating > 0 and rating_val > 0 and inter_rating <= rating_val:
+                        if genre and count2 < maxCount2:
+                            self.all_anime_details[key][self.ANIME_DETAILS_SIMILAR].append(
+                                {self.NAME: inter, self.ANIME_DETAILS_SIMILAR: 2})
+                            count2 += 1
+
+                        if not genre and media and count1 < maxCount1:
+                            self.all_anime_details[key][self.ANIME_DETAILS_SIMILAR].append(
+                                {self.NAME: inter, self.ANIME_DETAILS_SIMILAR: 1})
+                            count1 += 1
+                    if count1 >= maxCount1 or count2 >= maxCount2:
+                        break
+
+                if key not in rating_set:
+                    rating_set.add(key)
+                    rating_data.append(self.gen_leaf_rating_node(key, animes[parent][key][self.TAG_RATING]))
+            root_json.append(self.gen_default_node(parent, parentType, anime_json))
+
+        if genre:
+            root_json = self.gen_default_node(genre, "isGenre", root_json)
+        if media:
+            root_json = self.gen_default_node(media, "isMedia", root_json)
+        root_json = self.gen_default_node(category, "isRoot", root_json)
 
         rating_data = sorted(rating_data, key=lambda k: k[self.TAG_RATING], reverse=True)
 
@@ -452,7 +591,7 @@ if __name__ == "__main__":
     transform = Transform()
     # print transform.xml_to_json("animes.xml")
 
-    xml_dir = "anime_xmls"
-    des_dir = "anime_json"
+    xml_dir = "/home/kannan/datavis/vitches/api/anime_xmls"
+    des_dir = "/home/kannan/datavis/vitches/api/anime_json"
 
     transform.parse_all_files(xml_dir, des_dir, False)
